@@ -1,4 +1,4 @@
-package com.github.codecnomad.codecclient.mixin;
+package com.github.codecnomad.codecclient.mixins;
 
 import net.minecraft.client.gui.GuiMainMenu;
 import org.spongepowered.asm.mixin.Mixin;
