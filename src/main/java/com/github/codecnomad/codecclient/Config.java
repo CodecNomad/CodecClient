@@ -1,5 +1,6 @@
 package com.github.codecnomad.codecclient;
 
+import com.github.codecnomad.codecclient.modules.BlockEsp;
 import gg.essential.vigilance.Vigilant;
 import gg.essential.vigilance.data.Property;
 import gg.essential.vigilance.data.PropertyType;
@@ -37,27 +38,27 @@ public class Config extends Vigilant {
             description = "These are based on the block names, Use: Item1;Item2",
             category = "Esp"
     )
-    public static String BlockEspWhitelist = "Coal;Iron".toLowerCase();
+    public static String BlockEspWhitelist = "iron_block;coal_block".toLowerCase();
 
     @Property(
             type = PropertyType.SLIDER,
             name = "Block radius",
-            description = "The higher, the less fps you'll have",
+            description = "Set this to the size of the world, where you use your esp",
             category = "Esp",
             min = 5,
             max = 150
     )
-    public static int BlockEspRadius = 10;
+    public static int BlockEspRadius = 100;
 
     @Property(
-            type = PropertyType.SLIDER,
-            name = "Block update",
-            description = "The higher, the more fps you'll have, information may be outdated at high values",
-            category = "Esp",
-            min = 0,
-            max = 200
+            type = PropertyType.BUTTON,
+            name = "Update block esp",
+            description = "Press me after changing any settings to take effect",
+            category = "Esp"
     )
-    public static int BlockUpdate = 60;
+    private void UpdateBlockEsp() {
+        com.github.codecnomad.codecclient.modules.BlockEsp.shouldUpdateBlocks = true;
+    }
 
     public Config() {
         super(new File("./config/CodecClient.toml"));

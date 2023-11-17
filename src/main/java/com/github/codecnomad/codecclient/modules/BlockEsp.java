@@ -6,60 +6,86 @@ import com.github.codecnomad.codecclient.Module;
 import com.github.codecnomad.codecclient.utils.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.awt.*;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class BlockEsp extends Module {
-    // Todo: Make me multi-threaded daddy
-    Vector<BlockPos> positions = new Vector<>();
-    int counter = 0;
+    private final HashMap<Block, List<BlockPos>>  blocks = new HashMap<>();
+    public static boolean shouldUpdateBlocks = false;
     @SubscribeEvent
-    public void clientTick (TickEvent.ClientTickEvent event) {
-        if (counter < Config.BlockUpdate || CodecClient.mc.thePlayer == null) {counter++;return;} counter = 0;
+    public void worldLoad(WorldEvent.Load event) {
+        shouldUpdateBlocks = true;
+    }
 
-        int radius = Config.BlockEspRadius;
+    @SubscribeEvent
+    public void blockUpdate(BlockEvent event) {
+        if (!(event instanceof BlockEvent.BreakEvent) && !(event instanceof BlockEvent.NeighborNotifyEvent)) {
+            return;
+        }
 
-        positions.clear();
+        Block block = event.state.getBlock();
+        BlockPos pos = event.pos;
+        Block newBlock = CodecClient.mc.theWorld.getBlockState(pos).getBlock();
 
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
-                for (int z = -radius; z <= radius; z++) {
-                    BlockPos blockPos = CodecClient.mc.thePlayer.getPosition().add(x, y, z);
-                    Block currentBlock = CodecClient.mc.theWorld.getBlockState(blockPos).getBlock();
+        if (blocks.containsKey(block)) {
+            blocks.get(block).remove(pos);
+        }
 
-                    boolean isWhitelisted = false;
-                    if (!Config.BlockEspWhitelist.isEmpty()) {
-                        for (String whitelist : Config.BlockEspWhitelist.split(";")) {
-                            if (currentBlock.toString().contains(whitelist)) {
-                                isWhitelisted = true;
-                                break;
-                            }
+        if (!blocks.containsKey(newBlock)) {
+            blocks.put(newBlock, new ArrayList<>());
+        }
+        blocks.get(newBlock).add(pos);
+    }
+    @SubscribeEvent
+    public void playerTick(TickEvent.PlayerTickEvent event) {
+        if (shouldUpdateBlocks) {
+            shouldUpdateBlocks = false;
+            int radius = Config.BlockEspRadius;
+            final HashMap<Block, List<BlockPos>> buffer = new HashMap<>();
+
+            for (int x = -radius; x <= radius; x++) {
+                for (int y = -radius; y <= radius; y++) {
+                    for (int z = -radius; z <= radius; z++) {
+                        BlockPos pos = new BlockPos(
+                                event.player.posX + x,
+                                event.player.posY + y,
+                                event.player.posZ + z
+                        );
+                        Block block = event.player.getEntityWorld().getBlockState(pos).getBlock();
+
+                        if (!buffer.containsKey(block)) {
+                            buffer.put(block, new ArrayList<>());
                         }
-                    } else {
-                        continue;
+                        buffer.get(block).add(pos);
                     }
-
-                    if (!isWhitelisted) {
-                        continue;
-                    }
-
-                    positions.add(blockPos);
                 }
             }
+            blocks.clear();
+            blocks.putAll(buffer);
         }
     }
 
     @SubscribeEvent
     public void renderTick(RenderWorldLastEvent event) {
-        for (BlockPos pos : positions) {
-            GlStateManager.disableDepth();
-            RenderUtils.drawOutlinedFilledBoundingBox(pos, Color.blue, event.partialTicks);
-            GlStateManager.enableDepth();
+        if (blocks == null) {return;}
+        for (String name : Config.BlockEspWhitelist.split(";")) {
+            if (blocks.containsKey(Block.getBlockFromName("minecraft:" + name))) {
+                for (BlockPos pos : blocks.get(Block.getBlockFromName("minecraft:" + name))) {
+                    GlStateManager.disableDepth();
+                    RenderUtils.drawOutlinedFilledBoundingBox(pos, Color.blue, event.partialTicks);
+                    GlStateManager.enableDepth();
+                }
+            }
         }
     }
 }
