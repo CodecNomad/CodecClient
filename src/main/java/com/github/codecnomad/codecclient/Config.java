@@ -1,6 +1,5 @@
 package com.github.codecnomad.codecclient;
 
-import com.github.codecnomad.codecclient.modules.BlockEsp;
 import gg.essential.vigilance.Vigilant;
 import gg.essential.vigilance.data.Property;
 import gg.essential.vigilance.data.PropertyType;
@@ -13,7 +12,8 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.SWITCH,
             name = "EntityEsp",
-            category = "Modules"
+            category = "EntityEsp",
+            subcategory = "Config"
     )
     private boolean EntityEsp = CodecClient.modules.get("EntityEsp").state;
 
@@ -21,54 +21,52 @@ public class Config extends Vigilant {
             type = PropertyType.TEXT,
             name = "Entities",
             description = "These are based on the mob names, Use: Item1;Item2",
-            category = "Esp"
+            category = "EntityEsp",
+            subcategory = "Config"
     )
-    public static String EntityEspWhitelist = "Armor Stand;Anita".toLowerCase();
+    public static String EntityEspWhitelist = "Armor Stand;Anita";
 
     @Property(
-            type = PropertyType.SWITCH,
-            name = "BlockEsp",
-            category = "Modules"
+            type = PropertyType.DECIMAL_SLIDER,
+            minF = 0,
+            maxF = 360,
+            name = "Hue",
+            category = "EntityEsp",
+            subcategory = "Looks/Color"
     )
-    private boolean BlockEsp = CodecClient.modules.get("BlockEsp").state;
-
+    public static float EntityEspColorH = 200;
     @Property(
-            type = PropertyType.TEXT,
-            name = "Blocks",
-            description = "These are based on the block names, Use: Item1;Item2",
-            category = "Esp"
+            type = PropertyType.DECIMAL_SLIDER,
+            minF = 0,
+            maxF = 360,
+            name = "Saturation",
+            category = "EntityEsp",
+            subcategory = "Looks/Color"
     )
-    public static String BlockEspWhitelist = "iron_block;coal_block".toLowerCase();
-
+    public static float EntityEspColorS = 80;
     @Property(
-            type = PropertyType.SLIDER,
-            name = "Block radius",
-            description = "Set this to the size of the world, where you use your esp",
-            category = "Esp",
-            min = 5,
-            max = 150
+            type = PropertyType.DECIMAL_SLIDER,
+            minF = 0,
+            maxF = 360,
+            name = "Brightness",
+            category = "EntityEsp",
+            subcategory = "Looks/Color"
     )
-    public static int BlockEspRadius = 100;
-
+    public static float EntityEspColorB = 100;
     @Property(
-            type = PropertyType.BUTTON,
-            name = "Update block esp",
-            description = "Press me after changing any settings to take effect",
-            category = "Esp"
+            type = PropertyType.DECIMAL_SLIDER,
+            minF = 0.1f,
+            maxF= 1.f,
+            name = "Width",
+            category = "EntityEsp",
+            subcategory = "Looks/Size"
     )
-    private void UpdateBlockEsp() {
-        com.github.codecnomad.codecclient.modules.BlockEsp.shouldUpdateBlocks = true;
-    }
+    public static float EntityEspWidth = 0.5f;
 
     public Config() {
-        super(new File("./config/CodecClient.toml"));
+        super(new File("./CodecClient.toml"));
 
-        this.registerListener("EntityEsp", newState -> {
-            toggle("EntityEsp", (Boolean) newState);
-        });
-        this.registerListener("BlockEsp", newState -> {
-            toggle("BlockEsp", (Boolean) newState);
-        });
+        this.registerListener("EntityEsp", newState -> toggle("EntityEsp", (Boolean) newState));
     }
 
     private void toggle(String name, Boolean state) {

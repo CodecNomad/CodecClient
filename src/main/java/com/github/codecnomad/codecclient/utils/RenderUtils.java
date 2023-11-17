@@ -90,10 +90,10 @@ public class RenderUtils {
         int rectHeight = 8 + padding * 2;
         int alpha = 160;
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos(-rectWidth / 2, -1, 0).color(0, 0, 0, alpha).endVertex();
-        worldrenderer.pos(-rectWidth / 2, rectHeight - 1, 0).color(0, 0, 0, alpha).endVertex();
-        worldrenderer.pos(rectWidth / 2, rectHeight - 1, 0).color(0, 0, 0, alpha).endVertex();
-        worldrenderer.pos(rectWidth / 2, -1, 0).color(0, 0, 0, alpha).endVertex();
+        worldrenderer.pos((double) -rectWidth / 2, -1, 0).color(0, 0, 0, alpha).endVertex();
+        worldrenderer.pos((double) -rectWidth / 2, rectHeight - 1, 0).color(0, 0, 0, alpha).endVertex();
+        worldrenderer.pos((double) rectWidth / 2, rectHeight - 1, 0).color(0, 0, 0, alpha).endVertex();
+        worldrenderer.pos((double) rectWidth / 2, -1, 0).color(0, 0, 0, alpha).endVertex();
         tessellator.draw();
 
         GlStateManager.enableTexture2D();
@@ -171,7 +171,7 @@ public class RenderUtils {
         // fontrenderer.drawStringWithShadow(str, -fontrenderer.getStringWidth(str) / 2, i, 553648127);
         GlStateManager.enableDepth();
         GlStateManager.depthMask(true);
-        fontrenderer.drawStringWithShadow(str, -fontrenderer.getStringWidth(str) / 2, i, -1);
+        fontrenderer.drawStringWithShadow(str, (float) -fontrenderer.getStringWidth(str) / 2, i, -1);
         GlStateManager.enableLighting();
         GlStateManager.disableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

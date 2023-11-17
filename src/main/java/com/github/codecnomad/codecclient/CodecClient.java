@@ -1,6 +1,5 @@
 package com.github.codecnomad.codecclient;
 
-import com.github.codecnomad.codecclient.modules.BlockEsp;
 import com.github.codecnomad.codecclient.modules.EntityEsp;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -21,7 +20,6 @@ public class CodecClient {
     public static Map<String, Module> modules = new HashMap<>();
     static {
         modules.put("EntityEsp", new EntityEsp());
-        modules.put("BlockEsp", new BlockEsp());
     }
 
     public static Minecraft mc = Minecraft.getMinecraft();
@@ -34,8 +32,8 @@ public class CodecClient {
 
     @SubscribeEvent public void tick(TickEvent.RenderTickEvent event) {
         if (Config.state) {
-            mc.displayGuiScreen(new Config().gui());
             Config.state = false;
+            mc.displayGuiScreen(new Config().gui());
         }
     }
 }
