@@ -16,6 +16,6 @@ public class Module {
     }
 
     public Module() {
-        this.register();
+//        this.register();
     }
 }

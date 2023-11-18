@@ -18,6 +18,14 @@ public class Config extends Vigilant {
     private boolean EntityEsp = CodecClient.modules.get("EntityEsp").state;
 
     @Property(
+            type = PropertyType.SWITCH,
+            name = "FishingMacro",
+            category = "FishingMacro",
+            subcategory = "Config"
+    )
+    private boolean FishingMacro = CodecClient.modules.get("FishingMacro").state;
+
+    @Property(
             type = PropertyType.TEXT,
             name = "Entities",
             description = "These are based on the mob names, Use: Item1;Item2",
@@ -31,7 +39,7 @@ public class Config extends Vigilant {
             minF = 0,
             maxF = 360,
             name = "Hue",
-            category = "EntityEsp",
+            category = "All Esp",
             subcategory = "Looks/Color"
     )
     public static float EntityEspColorH = 200;
@@ -40,7 +48,7 @@ public class Config extends Vigilant {
             minF = 0,
             maxF = 360,
             name = "Saturation",
-            category = "EntityEsp",
+            category = "All Esp",
             subcategory = "Looks/Color"
     )
     public static float EntityEspColorS = 80;
@@ -49,7 +57,7 @@ public class Config extends Vigilant {
             minF = 0,
             maxF = 360,
             name = "Brightness",
-            category = "EntityEsp",
+            category = "All Esp",
             subcategory = "Looks/Color"
     )
     public static float EntityEspColorB = 100;
@@ -67,6 +75,8 @@ public class Config extends Vigilant {
         super(new File("./CodecClient.toml"));
 
         this.registerListener("EntityEsp", newState -> toggle("EntityEsp", (Boolean) newState));
+        this.registerListener("FishingMacro", newState -> toggle("FishingMacro", (Boolean) newState));
+
     }
 
     private void toggle(String name, Boolean state) {

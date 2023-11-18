@@ -1,13 +1,17 @@
 package com.github.codecnomad.codecclient;
 
 import com.github.codecnomad.codecclient.modules.EntityEsp;
+import com.github.codecnomad.codecclient.modules.FishingMacro;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.lwjgl.input.Keyboard;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +24,7 @@ public class CodecClient {
     public static Map<String, Module> modules = new HashMap<>();
     static {
         modules.put("EntityEsp", new EntityEsp());
+        modules.put("FishingMacro", new FishingMacro());
     }
 
     public static Minecraft mc = Minecraft.getMinecraft();
@@ -34,6 +39,14 @@ public class CodecClient {
         if (Config.state) {
             Config.state = false;
             mc.displayGuiScreen(new Config().gui());
+        }
+    }
+
+    @SubscribeEvent public void input(InputEvent.KeyInputEvent event) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_J)) {
+            for (Map.Entry<String, Module> moduleMap : modules.entrySet()) {
+                moduleMap.getValue().unregister();
+            }
         }
     }
 }
