@@ -7,7 +7,6 @@ import com.github.codecnomad.codecclient.mixins.S19Accessor;
 import com.github.codecnomad.codecclient.utils.ChatUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
@@ -20,90 +19,80 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class FishingMacro extends Module {
-    private static final int SEARCHING_ROD_STATE = -1;
-    private static final int CASTING_STATE = 0;
-    private static final int HOOK_CHECK_STATE = 1;
-    private int currentState = SEARCHING_ROD_STATE;
-    private long castTime = 0;
+    private static final int FIND_ROD = 0;
+    private static final int CASTING_HOOK = 1;
+    private static final int HOOK_CHECK_STATE = 2;
+
+    private int currentState = FIND_ROD;
     private int counter = 0;
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
-
-        EntityPlayer player = CodecClient.mc.thePlayer;
-        if (player == null || counter < 20) {
-            counter++;
-            return;
-        } counter = 0;
-
         switch (currentState) {
-            case SEARCHING_ROD_STATE:
-                findAndSelectFishingRod(player);
-                break;
+            case FIND_ROD: {
+                if (CodecClient.mc.thePlayer == null || counter < 20) {
+                    counter++;
+                    return;
+                } counter = 0;
 
-            case CASTING_STATE:
-                castRod(player);
-                break;
+                for (int slotIndex = 0; slotIndex < CodecClient.mc.thePlayer.inventory.getSizeInventory(); slotIndex++) {
+                    ItemStack stack = CodecClient.mc.thePlayer.inventory.getStackInSlot(slotIndex);
+                    if (stack != null && stack.getItem() instanceof ItemFishingRod) {
+                        CodecClient.mc.thePlayer.inventory.currentItem = slotIndex;
+                        currentState = CASTING_HOOK;
+                        return;
+                    }
+                }
+
+                ChatUtils.sendMessage("Disabled macro -> couldn't find rod.");
+                this.unregister();
+
+                return;
+            }
+
+            case CASTING_HOOK: {
+                if (CodecClient.mc.thePlayer == null || counter < 20) {
+                    counter++;
+                    return;
+                } counter = 0;
+
+                CodecClient.mc.playerController.sendUseItem(CodecClient.mc.thePlayer, CodecClient.mc.thePlayer.getEntityWorld(), CodecClient.mc.thePlayer.inventory.getCurrentItem());
+                currentState = HOOK_CHECK_STATE;
+
+                return;
+            }
 
             case HOOK_CHECK_STATE:
-                checkHookState(player);
-                break;
-        }
-    }
+            {
+                if (CodecClient.mc.thePlayer == null || counter < 20) {
+                    counter++;
+                    return;
+                } counter = 0;
 
-    private void findAndSelectFishingRod(EntityPlayer player) {
-        ChatUtils.sendMessage("Searching for a fishing rod...");
-        for (int slotIndex = 0; slotIndex < player.inventory.getSizeInventory(); slotIndex++) {
-            ItemStack stack = player.inventory.getStackInSlot(slotIndex);
-            if (stack != null && stack.getItem() instanceof ItemFishingRod) {
-                ChatUtils.sendMessage("Found a fishing rod!");
-                player.inventory.currentItem = slotIndex;
-                currentState = CASTING_STATE;
+                Entity fishingHook = null;
+                for (Entity entity : CodecClient.mc.theWorld.loadedEntityList) {
+                    if (entity instanceof EntityFishHook && ((EntityFishHook) entity).angler == CodecClient.mc.thePlayer) {
+                        fishingHook = entity;
+                    }
+                }
+
+                if (fishingHook == null) {
+                    currentState = FIND_ROD;
+                    return;
+                }
+
+                if (fishingMarker != null && fishingMarker.isEntityAlive() && fishingMarker.getName().contains("!!!")) {
+                    CodecClient.mc.playerController.sendUseItem(CodecClient.mc.thePlayer, CodecClient.mc.thePlayer.getEntityWorld(), CodecClient.mc.thePlayer.inventory.getCurrentItem());
+
+                    currentState = FIND_ROD;
+                    fishingMarker = null;
+                }
+
                 return;
             }
         }
-        ChatUtils.sendMessage("Failed to find a fishing rod...");
-        this.unregister();
     }
 
-    private void castRod(EntityPlayer player) {
-        ChatUtils.sendMessage("Casting the fishing rod...");
-        CodecClient.mc.playerController.sendUseItem(player, player.getEntityWorld(), player.inventory.getCurrentItem());
-        castTime = System.currentTimeMillis();
-        currentState = HOOK_CHECK_STATE;
-    }
-
-    private void checkHookState(EntityPlayer player) {
-        EntityFishHook fishingHook = findFishingHook(player);
-        if (fishingHook == null) {
-            ChatUtils.sendMessage("Couldn't find the fishing hook...");
-            currentState = SEARCHING_ROD_STATE;
-            return;
-        }
-
-        long currentTime = System.currentTimeMillis();
-        if (isFishCaught()) {
-            ChatUtils.sendMessage("Fish caught! Took: " + ((currentTime - castTime) / 1000) + "s");
-            CodecClient.mc.playerController.sendUseItem(player, player.getEntityWorld(), player.inventory.getCurrentItem());
-            currentState = SEARCHING_ROD_STATE;
-            fishingMarker = null;
-        }
-    }
-
-    private EntityFishHook findFishingHook(EntityPlayer player) {
-        for (Entity entity : CodecClient.mc.theWorld.loadedEntityList) {
-            if (entity instanceof EntityFishHook && ((EntityFishHook) entity).angler == player) {
-                return (EntityFishHook) entity;
-            }
-        }
-        return null;
-    }
-
-    private Entity fishingMarker = null;
-    private boolean isFishCaught() {
-        if (fishingMarker == null || !fishingMarker.isEntityAlive()) {return false;}
-        return fishingMarker.getName().contains("!!!");
-    }
-
+    Entity fishingMarker;
     @SubscribeEvent
     public void entitySpawn(EntityJoinWorldEvent event) {
         if (event.entity instanceof EntityArmorStand) {
@@ -137,7 +126,7 @@ public class FishingMacro extends Module {
             }
         }
 
-        ChatUtils.sendMessage("§4§lFailsafe triggered! Turning off macro.");
+        ChatUtils.sendMessage("Disabled macro -> failsafe has been triggered");
         this.unregister();
     }
 }
