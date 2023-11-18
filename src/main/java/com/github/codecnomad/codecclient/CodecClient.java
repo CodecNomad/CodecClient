@@ -2,9 +2,9 @@ package com.github.codecnomad.codecclient;
 
 import com.github.codecnomad.codecclient.modules.EntityEsp;
 import com.github.codecnomad.codecclient.modules.FishingMacro;
+import com.github.codecnomad.codecclient.utils.ChatUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -44,6 +44,7 @@ public class CodecClient {
 
     @SubscribeEvent public void input(InputEvent.KeyInputEvent event) {
         if (Keyboard.isKeyDown(Keyboard.KEY_J)) {
+            ChatUtils.sendMessage("Turned off all macros.");
             for (Map.Entry<String, Module> moduleMap : modules.entrySet()) {
                 moduleMap.getValue().unregister();
             }

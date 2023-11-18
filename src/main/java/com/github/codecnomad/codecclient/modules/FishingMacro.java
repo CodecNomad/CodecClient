@@ -2,6 +2,8 @@ package com.github.codecnomad.codecclient.modules;
 
 import com.github.codecnomad.codecclient.CodecClient;
 import com.github.codecnomad.codecclient.Module;
+import com.github.codecnomad.codecclient.PacketEvent;
+import com.github.codecnomad.codecclient.mixins.S19Accessor;
 import com.github.codecnomad.codecclient.utils.ChatUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
@@ -9,10 +11,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
+import net.minecraft.network.play.server.S18PacketEntityTeleport;
+import net.minecraft.network.play.server.S19PacketEntityHeadLook;
+import net.minecraft.network.play.server.S1BPacketEntityAttach;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 public class FishingMacro extends Module {
     private static final int SEARCHING_ROD_STATE = -1;
@@ -93,7 +98,6 @@ public class FishingMacro extends Module {
         return null;
     }
 
-    // Best detection
     private Entity fishingMarker = null;
     private boolean isFishCaught() {
         if (fishingMarker == null || !fishingMarker.isEntityAlive()) {return false;}
@@ -105,5 +109,35 @@ public class FishingMacro extends Module {
         if (event.entity instanceof EntityArmorStand) {
             fishingMarker = event.entity;
         }
+    }
+
+    @SubscribeEvent
+    public void packetReceive(PacketEvent.ReceiveEvent event) {
+        if (event.packet instanceof S19PacketEntityHeadLook) {
+            if (((S19Accessor) event.packet).getEntityId() != CodecClient.mc.thePlayer.getEntityId()) {
+                return;
+            }
+        }
+
+        else if (event.packet instanceof S18PacketEntityTeleport) {
+            if (((S18PacketEntityTeleport) event.packet).getEntityId() != CodecClient.mc.thePlayer.getEntityId()) {
+                return;
+            }
+        }
+
+        else if (event.packet instanceof S12PacketEntityVelocity) {
+            if (((S12PacketEntityVelocity) event.packet).getEntityID() != CodecClient.mc.thePlayer.getEntityId()) {
+                return;
+            }
+        }
+
+        else if (event.packet instanceof S1BPacketEntityAttach) {
+            if (((S1BPacketEntityAttach) event.packet).getEntityId() != CodecClient.mc.thePlayer.getEntityId()) {
+                return;
+            }
+        }
+
+        ChatUtils.sendMessage("§4§lFailsafe triggered! Turning off macro.");
+        this.unregister();
     }
 }
