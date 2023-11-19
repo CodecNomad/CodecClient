@@ -142,32 +142,12 @@ public class FishingMacro extends Module {
 
     @SubscribeEvent
     public void packetReceive(PacketEvent.ReceiveEvent event) {
-        if (event.packet instanceof S19PacketEntityHeadLook) {
-            if (((S19Accessor) event.packet).getEntityId() != CodecClient.mc.thePlayer.getEntityId()) {
-                return;
+        if (event.packet instanceof S18PacketEntityTeleport) {
+            if (((S18PacketEntityTeleport) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()) {
+                CodecClient.rotation.reset();
+                failSafe = true;
             }
         }
-
-        else if (event.packet instanceof S18PacketEntityTeleport) {
-            if (((S18PacketEntityTeleport) event.packet).getEntityId() != CodecClient.mc.thePlayer.getEntityId()) {
-                return;
-            }
-        }
-
-        else if (event.packet instanceof S12PacketEntityVelocity) {
-            if (((S12PacketEntityVelocity) event.packet).getEntityID() != CodecClient.mc.thePlayer.getEntityId()) {
-                return;
-            }
-        }
-
-        else if (event.packet instanceof S1BPacketEntityAttach) {
-            if (((S1BPacketEntityAttach) event.packet).getEntityId() != CodecClient.mc.thePlayer.getEntityId()) {
-                return;
-            }
-        }
-
-        CodecClient.rotation.reset();
-        failSafe = true;
     }
 
     int fCounter = 0;
@@ -179,12 +159,12 @@ public class FishingMacro extends Module {
 
         if (fCounter == 20) {
             ChatUtils.sendMessage("Disabled macro -> failsafe has been triggered");
-            CodecClient.mc.thePlayer.sendChatMessage("Macro check??");
+            CodecClient.mc.thePlayer.sendChatMessage("uhm hello?");
             CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
         }
 
-        if (fCounter == 40) {
-            CodecClient.mc.thePlayer.sendChatMessage("Hello? leasty send me a frigehn request brur");
+        if (fCounter == 80) {
+            CodecClient.mc.thePlayer.sendChatMessage("tf was that");
             CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
             failSafe = false;
             fCounter = 0;
