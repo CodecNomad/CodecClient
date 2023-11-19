@@ -10,10 +10,7 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.S12PacketEntityVelocity;
-import net.minecraft.network.play.server.S18PacketEntityTeleport;
-import net.minecraft.network.play.server.S19PacketEntityHeadLook;
-import net.minecraft.network.play.server.S1BPacketEntityAttach;
+import net.minecraft.network.play.server.*;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -142,11 +139,13 @@ public class FishingMacro extends Module {
 
     @SubscribeEvent
     public void packetReceive(PacketEvent.ReceiveEvent event) {
-        if (event.packet instanceof S18PacketEntityTeleport) {
-            if (((S18PacketEntityTeleport) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()) {
-                CodecClient.rotation.reset();
-                failSafe = true;
-            }
+        if (
+                event.packet instanceof S08PacketPlayerPosLook ||
+                (event.packet instanceof S1BPacketEntityAttach && ((S1BPacketEntityAttach) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()) ||
+                (event.packet instanceof S18PacketEntityTeleport && ((S18PacketEntityTeleport) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId())
+        ) {
+            CodecClient.rotation.reset();
+            failSafe = true;
         }
     }
 
@@ -159,12 +158,12 @@ public class FishingMacro extends Module {
 
         if (fCounter == 20) {
             ChatUtils.sendMessage("Disabled macro -> failsafe has been triggered");
-            CodecClient.mc.thePlayer.sendChatMessage("uhm hello?");
+            CodecClient.mc.thePlayer.sendChatMessage("is that a macro check??");
             CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
         }
 
         if (fCounter == 80) {
-            CodecClient.mc.thePlayer.sendChatMessage("tf was that");
+            CodecClient.mc.thePlayer.sendChatMessage("i guess it was kek");
             CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
             failSafe = false;
             fCounter = 0;

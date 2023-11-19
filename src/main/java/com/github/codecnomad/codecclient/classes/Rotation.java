@@ -10,8 +10,8 @@ public class Rotation {
     private float yawGoal = 0;
     private float pitchGoal = 0;
 
-    private boolean updateYaw = false;
-    private boolean updatePitch = false;
+    public boolean updateYaw = false;
+    public boolean updatePitch = false;
 
     private int yawSmooth;
     private int pitchSmooth;
