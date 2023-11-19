@@ -177,13 +177,13 @@ public class FishingMacro extends Module {
             fCounter++;
         }
 
-        if (fCounter > 20) {
+        if (fCounter == 20) {
             ChatUtils.sendMessage("Disabled macro -> failsafe has been triggered");
             CodecClient.mc.thePlayer.sendChatMessage("Macro check??");
             CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
         }
 
-        if (fCounter > 40) {
+        if (fCounter == 40) {
             CodecClient.mc.thePlayer.sendChatMessage("Hello? leasty send me a frigehn request brur");
             CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
             failSafe = false;
