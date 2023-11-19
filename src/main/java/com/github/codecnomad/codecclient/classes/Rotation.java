@@ -34,7 +34,7 @@ public class Rotation {
     }
 
     @SubscribeEvent
-    public void clientTick(TickEvent.PlayerTickEvent event) {
+    public void clientTick(TickEvent.ClientTickEvent event) {
         if (updateYaw) {
             CodecClient.mc.thePlayer.rotationYaw = MathUtils.interpolate(yawGoal, CodecClient.mc.thePlayer.rotationYaw, (float) 1 / yawSmooth);
 

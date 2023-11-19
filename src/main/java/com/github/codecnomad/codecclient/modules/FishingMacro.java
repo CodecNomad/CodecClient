@@ -151,19 +151,20 @@ public class FishingMacro extends Module {
 
     int fCounter = 0;
     @SubscribeEvent
-    public void playerTick(TickEvent.PlayerTickEvent event) {
-        if (failSafe) {
-            fCounter++;
+    public void clientTick(TickEvent.ClientTickEvent event) {
+        if (!failSafe) {
+            return;
         }
+        fCounter++;
+
+        CodecClient.mc.thePlayer.playSound("random.anvil_land", 10.f, 1.f);
 
         if (fCounter == 20) {
             ChatUtils.sendMessage("Disabled macro -> failsafe has been triggered");
-            CodecClient.mc.thePlayer.sendChatMessage("is that a macro check??");
             CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
         }
 
         if (fCounter == 80) {
-            CodecClient.mc.thePlayer.sendChatMessage("i guess it was kek");
             CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
             failSafe = false;
             fCounter = 0;
