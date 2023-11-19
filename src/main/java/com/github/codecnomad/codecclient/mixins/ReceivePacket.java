@@ -1,10 +1,7 @@
 package com.github.codecnomad.codecclient.mixins;
 
-import com.github.codecnomad.codecclient.PacketEvent;
+import com.github.codecnomad.codecclient.classes.PacketEvent;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.*;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;

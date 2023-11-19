@@ -1,5 +1,7 @@
-package com.github.codecnomad.codecclient;
+package com.github.codecnomad.codecclient.classes;
 
+import com.github.codecnomad.codecclient.CodecClient;
+import com.github.codecnomad.codecclient.classes.Module;
 import gg.essential.vigilance.Vigilant;
 import gg.essential.vigilance.data.Property;
 import gg.essential.vigilance.data.PropertyType;

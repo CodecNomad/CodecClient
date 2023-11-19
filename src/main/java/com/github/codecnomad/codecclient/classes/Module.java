@@ -1,4 +1,4 @@
-package com.github.codecnomad.codecclient;
+package com.github.codecnomad.codecclient.classes;
 
 import net.minecraftforge.common.MinecraftForge;
 

@@ -1,8 +1,13 @@
 package com.github.codecnomad.codecclient;
 
+import com.github.codecnomad.codecclient.classes.Command;
+import com.github.codecnomad.codecclient.classes.Config;
+import com.github.codecnomad.codecclient.classes.Module;
+import com.github.codecnomad.codecclient.classes.Rotation;
 import com.github.codecnomad.codecclient.modules.EntityEsp;
 import com.github.codecnomad.codecclient.modules.FishingMacro;
 import com.github.codecnomad.codecclient.utils.ChatUtils;
+import com.github.codecnomad.codecclient.utils.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,9 +34,11 @@ public class CodecClient {
 
     public static Minecraft mc = Minecraft.getMinecraft();
 
+    public static Rotation rotation = new Rotation();
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(rotation);
         ClientCommandHandler.instance.registerCommand(new Command());
     }
 
@@ -50,4 +57,5 @@ public class CodecClient {
             }
         }
     }
+
 }

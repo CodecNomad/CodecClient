@@ -1,12 +1,11 @@
 package com.github.codecnomad.codecclient.modules;
 
-import com.github.codecnomad.codecclient.Config;
-import com.github.codecnomad.codecclient.Module;
+import com.github.codecnomad.codecclient.classes.Config;
+import com.github.codecnomad.codecclient.classes.Module;
 import com.github.codecnomad.codecclient.utils.RenderUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -15,9 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 public class EntityEsp extends Module {
     private final HashSet<Entity> entityList = new HashSet<>();

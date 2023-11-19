@@ -1,6 +1,6 @@
 package com.github.codecnomad.codecclient.mixins;
 
-import com.github.codecnomad.codecclient.PacketEvent;
+import com.github.codecnomad.codecclient.classes.PacketEvent;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraftforge.common.MinecraftForge;

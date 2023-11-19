@@ -4,18 +4,13 @@ import com.github.codecnomad.codecclient.CodecClient;
 import net.minecraft.util.BlockPos;
 
 public class MathUtils {
-    float interpolate(float goal, float current, float time) {
-        float difference = goal - current;
 
-        if (difference > time) {
-            return current + time;
-        }
-
-        if (difference < time) {
-            return current - time;
-        }
-
-        return goal;
+    public static float easeInOut(float t) {
+        return t * t * (3.0f - 2.0f * t);
+    }
+    public static float interpolate(float goal, float current, float time) {
+        float t = easeInOut(time);
+        return current + (goal - current) * t;
     }
 
     float getYaw(BlockPos pos) {

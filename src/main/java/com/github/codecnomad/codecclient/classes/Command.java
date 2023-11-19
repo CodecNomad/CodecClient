@@ -1,5 +1,6 @@
-package com.github.codecnomad.codecclient;
+package com.github.codecnomad.codecclient.classes;
 
+import com.github.codecnomad.codecclient.classes.Config;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

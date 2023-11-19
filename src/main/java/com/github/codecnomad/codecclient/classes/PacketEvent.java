@@ -1,4 +1,4 @@
-package com.github.codecnomad.codecclient;
+package com.github.codecnomad.codecclient.classes;
 
 import net.minecraft.network.Packet;
 import net.minecraftforge.fml.common.eventhandler.Event;
