@@ -182,5 +182,13 @@ public class FishingMacro extends Module {
             CodecClient.mc.thePlayer.sendChatMessage("Macro check??");
             CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
         }
+
+        if (fCounter > 40) {
+            CodecClient.mc.thePlayer.sendChatMessage("Hello? leasty send me a frigehn request brur");
+            CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
+            failSafe = false;
+            fCounter = 0;
+            this.unregister();
+        }
     }
 }
