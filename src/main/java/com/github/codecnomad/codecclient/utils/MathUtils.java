@@ -13,11 +13,11 @@ public class MathUtils {
         return current + (goal - current) * t;
     }
 
-    float getYaw(BlockPos pos) {
-        return (float) Math.toDegrees(Math.atan2(pos.getZ(), pos.getX()));
+    float getYaw(BlockPos p) {
+        return (float) Math.toDegrees(Math.atan2(p.getZ(), p.getX()));
     }
 
-    float getPitch(BlockPos pos) {
-        return (float) Math.toDegrees(-Math.asin(pos.getY() / CodecClient.mc.thePlayer.getDistanceSq(pos)));
+    float getPitch(BlockPos p) {
+        return (float) Math.toDegrees(-Math.asin(p.getY() / CodecClient.mc.thePlayer.getDistanceSq(p)));
     }
 }

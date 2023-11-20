@@ -16,15 +16,15 @@ public class Rotation {
     private int yawSmooth;
     private int pitchSmooth;
 
-    public void setYaw(float yaw, int time) {
+    public void setYaw(float yaw, int smoothing) {
         yawGoal = yaw;
-        yawSmooth = time;
+        yawSmooth = smoothing;
         updateYaw = true;
     }
 
-    public void setPitch(float pitch, int time) {
+    public void setPitch(float pitch, int smoothing) {
         pitchGoal = pitch;
-        pitchSmooth = time;
+        pitchSmooth = smoothing;
         updatePitch = true;
     }
 

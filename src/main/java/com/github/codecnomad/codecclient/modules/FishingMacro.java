@@ -141,6 +141,8 @@ public class FishingMacro extends Module {
     public void packetReceive(PacketEvent.ReceiveEvent event) {
         if (
                 event.packet instanceof S08PacketPlayerPosLook ||
+                event.packet instanceof S09PacketHeldItemChange ||
+                (event.packet instanceof S19PacketEntityHeadLook && ((S19Accessor) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()) ||
                 (event.packet instanceof S1BPacketEntityAttach && ((S1BPacketEntityAttach) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()) ||
                 (event.packet instanceof S18PacketEntityTeleport && ((S18PacketEntityTeleport) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId())
         ) {
@@ -161,11 +163,12 @@ public class FishingMacro extends Module {
 
         if (fCounter == 20) {
             ChatUtils.sendMessage("Disabled macro -> failsafe has been triggered");
-            CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
+            CodecClient.rotation.setYaw(-180 + (Math.random() * 360));
         }
 
-        if (fCounter == 80) {
-            CodecClient.rotation.setYaw(CodecClient.mc.thePlayer.rotationYaw + (int) (-45 + Math.random() * 45), 10);
+        if (fCounter == 60) {
+            CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw -179 + (Math.random() * 360)), 10);
+            CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch -29 + (Math.random() * 60)), 10);
             failSafe = false;
             fCounter = 0;
             this.unregister();
