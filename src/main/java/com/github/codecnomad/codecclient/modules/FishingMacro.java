@@ -5,6 +5,8 @@ import com.github.codecnomad.codecclient.classes.Module;
 import com.github.codecnomad.codecclient.classes.PacketEvent;
 import com.github.codecnomad.codecclient.mixins.S19Accessor;
 import com.github.codecnomad.codecclient.utils.ChatUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.projectile.EntityFishHook;
@@ -15,7 +17,11 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FishingMacro extends Module {
+    private static final String[] FAILSAFE_TEXT = new String[] {"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "hiiiiii", "can i get friend request??", "henlo i'm here",};
     private static final int FIND_ROD = 0;
     private static final int LOOK_AROUND = 1;
     private static final int CASTING_HOOK = 2;
@@ -163,12 +169,37 @@ public class FishingMacro extends Module {
 
         if (fCounter == 20) {
             ChatUtils.sendMessage("Disabled macro -> failsafe has been triggered");
-            CodecClient.rotation.setYaw(-180 + (Math.random() * 360));
+            CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw -89 + (Math.random() * 180)), 7);
+            CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch -14 + (Math.random() * 30)), 7);
+            KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindBack.getKeyCode(), true);
+            KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindRight.getKeyCode(), true);
+        }
+
+        if (fCounter == 45) {
+            KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindBack.getKeyCode(), false);
+            KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindRight.getKeyCode(), false);
         }
 
         if (fCounter == 60) {
-            CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw -179 + (Math.random() * 360)), 10);
-            CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch -29 + (Math.random() * 60)), 10);
+            CodecClient.mc.thePlayer.sendChatMessage(FAILSAFE_TEXT[(int) (Math.random() * FAILSAFE_TEXT.length)]);
+            CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw -89 + (Math.random() * 180)), 7);
+            CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch -14 + (Math.random() * 30)), 7);
+        }
+
+        if (fCounter == 80) {
+            CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw -89 + (Math.random() * 180)), 7);
+            CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch -14 + (Math.random() * 30)), 7);
+        }
+
+        if (fCounter == 90) {
+            KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindForward.getKeyCode(), true);
+        }
+
+        if (fCounter == 105) {
+            KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindForward.getKeyCode(), false);
+        }
+
+        if (fCounter == 120) {
             failSafe = false;
             fCounter = 0;
             this.unregister();
