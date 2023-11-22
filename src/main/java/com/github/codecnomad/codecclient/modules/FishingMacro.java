@@ -92,7 +92,7 @@ public class FishingMacro extends Module {
 
             case WAIT_FOR_CATCH:
             {
-                if (MainCounter.countUntil(20)) {
+                if (MainCounter.countUntil(10)) {
                     return;
                 }
 
