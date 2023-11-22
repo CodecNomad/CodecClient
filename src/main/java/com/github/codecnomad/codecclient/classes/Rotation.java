@@ -37,7 +37,6 @@ public class Rotation {
     public void clientTick(TickEvent.ClientTickEvent event) {
         if (updateYaw) {
             CodecClient.mc.thePlayer.rotationYaw = MathUtils.interpolate(yawGoal, CodecClient.mc.thePlayer.rotationYaw, (float) 1 / yawSmooth);
-            ChatUtils.sendMessage(String.valueOf(MathUtils.interpolate(yawGoal, CodecClient.mc.thePlayer.rotationYaw, (float) 1 / yawSmooth)));
             if (Math.abs(CodecClient.mc.thePlayer.rotationYaw - yawGoal) < 3f) {
                 updateYaw = false;
             }
@@ -45,7 +44,6 @@ public class Rotation {
 
         if (updatePitch) {
             CodecClient.mc.thePlayer.rotationPitch = MathUtils.interpolate(pitchGoal, CodecClient.mc.thePlayer.rotationPitch, (float) 1 / pitchSmooth);
-            ChatUtils.sendMessage(String.valueOf(CodecClient.mc.thePlayer.rotationPitch = MathUtils.interpolate(pitchGoal, CodecClient.mc.thePlayer.rotationPitch, (float) 1 / pitchSmooth)));
             if (Math.abs(CodecClient.mc.thePlayer.rotationPitch - pitchGoal) < 3f) {
                 updatePitch = false;
             }

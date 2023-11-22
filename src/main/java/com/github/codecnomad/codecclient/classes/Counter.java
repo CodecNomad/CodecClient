@@ -6,7 +6,6 @@ public class Counter {
     private int count;
 
     public boolean countUntil(int threshold) {
-        ChatUtils.sendMessage(String.valueOf(count));
         if (count >= threshold) {
             reset();
             return false;

@@ -14,12 +14,13 @@ import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.*;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import tv.twitch.chat.Chat;
 
 public class FishingMacro extends Module {
+
     public static final String[] FAILSAFE_TEXT = new String[] {"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "hiiiiii", "can i get friend request??", "henlo i'm here",};
 
     public enum FishingSteps {
@@ -37,6 +38,19 @@ public class FishingMacro extends Module {
 
     Entity fishingHook = null;
     Entity fishingMarker = null;
+
+    @Override
+    public void unregister() {
+        MinecraftForge.EVENT_BUS.unregister(this);
+        this.state = false;
+
+        currentStep = FishingSteps.FIND_ROD;
+        MainCounter.reset();
+        FailsafeCounter.reset();
+        failSafe = false;
+        fishingHook = null;
+        fishingMarker = null;
+    }
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -99,7 +113,6 @@ public class FishingMacro extends Module {
                     return;
                 }
 
-                currentStep = FishingSteps.FIND_ROD;
                 return;
             }
 
