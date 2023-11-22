@@ -17,6 +17,7 @@ import net.minecraft.network.play.server.*;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import tv.twitch.chat.Chat;
 
 public class FishingMacro extends Module {
     public static final String[] FAILSAFE_TEXT = new String[] {"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "hiiiiii", "can i get friend request??", "henlo i'm here",};
@@ -61,10 +62,10 @@ public class FishingMacro extends Module {
             }
 
             case LOOK_TO_NEW_BLOCK: {
-                CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw + 19* Math.random() * 40), 7);
-                CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch + 19* Math.random() * 40), 7);
+                CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw -4 + Math.random() * 10), 7);
+                CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch -4 + Math.random() * 10), 7);
 
-                currentStep = FishingSteps.WAIT_FOR_CATCH;
+                currentStep = FishingSteps.CAST_HOOK;
                 return;
             }
 
@@ -95,13 +96,15 @@ public class FishingMacro extends Module {
                 if (fishingMarker != null && fishingMarker.isEntityAlive() && fishingMarker.getName().contains("!!!")) {
                     currentStep = FishingSteps.CATCH;
                     fishingMarker = null;
+                    return;
                 }
 
+                currentStep = FishingSteps.FIND_ROD;
                 return;
             }
 
             case CATCH: {
-                KeyBinding.onTick(CodecClient.mc.gameSettings.keyBindUseItem.getKeyCode());
+                CodecClient.mc.playerController.sendUseItem(CodecClient.mc.thePlayer, CodecClient.mc.thePlayer.getEntityWorld(), CodecClient.mc.thePlayer.inventory.getCurrentItem());
 
                 currentStep = FishingSteps.FIND_ROD;
                 return;
