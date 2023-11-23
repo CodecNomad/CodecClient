@@ -159,7 +159,7 @@ public class FishingMacro extends Module {
             return;
         }
 
-        if (!FailsafeCounter.countUntil(120)) {
+        if (FailsafeCounter.countUntil(120)) {
 
             CodecClient.mc.thePlayer.playSound("random.anvil_land", 10.f, 1.f);
 
