@@ -8,7 +8,4 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface S19Accessor {
     @Accessor("entityId")
     int getEntityId();
-
-    @Accessor("entityId")
-    void setEntityId(int entityId);
 }

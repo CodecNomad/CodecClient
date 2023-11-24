@@ -1,7 +1,6 @@
 package com.github.codecnomad.codecclient.classes;
 
 import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.classes.Module;
 import gg.essential.vigilance.Vigilant;
 import gg.essential.vigilance.data.Property;
 import gg.essential.vigilance.data.PropertyType;
@@ -75,7 +74,7 @@ public class Config extends Vigilant {
 
     public Config() {
         super(new File("./CodecClient.toml"));
-
+        initialize();
         this.registerListener("EntityEsp", newState -> toggle("EntityEsp", (Boolean) newState));
         this.registerListener("FishingMacro", newState -> toggle("FishingMacro", (Boolean) newState));
 

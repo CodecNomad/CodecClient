@@ -7,7 +7,6 @@ import com.github.codecnomad.codecclient.classes.Rotation;
 import com.github.codecnomad.codecclient.modules.EntityEsp;
 import com.github.codecnomad.codecclient.modules.FishingMacro;
 import com.github.codecnomad.codecclient.utils.ChatUtils;
-import com.github.codecnomad.codecclient.utils.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,16 +15,14 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.lwjgl.input.Keyboard;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 @Mod(modid = "codecclient", useMetadata=true)
 public class CodecClient {
-    public static Logger logger = Logger.getLogger("CodecClient");
-
     public static Map<String, Module> modules = new HashMap<>();
     static {
         modules.put("EntityEsp", new EntityEsp());
@@ -58,4 +55,9 @@ public class CodecClient {
         }
     }
 
+    @SubscribeEvent public void disconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
+        for (Map.Entry<String, Module> moduleMap : modules.entrySet()) {
+            moduleMap.getValue().unregister();
+        }
+    }
 }

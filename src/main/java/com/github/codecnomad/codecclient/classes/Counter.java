@@ -1,7 +1,5 @@
 package com.github.codecnomad.codecclient.classes;
 
-import com.github.codecnomad.codecclient.utils.ChatUtils;
-
 public class Counter {
     private int count;
 

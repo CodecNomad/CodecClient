@@ -1,7 +1,6 @@
 package com.github.codecnomad.codecclient.classes;
 
 import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.utils.ChatUtils;
 import com.github.codecnomad.codecclient.utils.MathUtils;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
