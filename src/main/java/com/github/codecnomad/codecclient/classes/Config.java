@@ -74,10 +74,8 @@ public class Config extends Vigilant {
 
     public Config() {
         super(new File("./CodecClient.toml"));
-        initialize();
         this.registerListener("EntityEsp", newState -> toggle("EntityEsp", (Boolean) newState));
         this.registerListener("FishingMacro", newState -> toggle("FishingMacro", (Boolean) newState));
-
     }
 
     private void toggle(String name, Boolean state) {
