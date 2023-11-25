@@ -183,7 +183,13 @@ public class FishingMacro extends Module {
             }
 
             case KILL_MONSTER: {
-                if (fishingMonster == null || !fishingMonster.isEntityAlive()) {
+                if (fishingMonster == null || !fishingMonster.isEntityAlive() ||
+                    CodecClient.mc.theWorld.rayTraceBlocks(
+                    new Vec3(CodecClient.mc.thePlayer.posX, CodecClient.mc.thePlayer.posY + CodecClient.mc.thePlayer.getEyeHeight(), CodecClient.mc.thePlayer.posZ),
+                    new Vec3(fishingMonster.posX + 0.5, fishingMonster.posY + 0.5, fishingMonster.posZ + 0.5),
+                    false, true, false) == null
+                )
+                {
                     currentStep = FishingSteps.FIND_ROD;
                     fishingMonster = null;
                     return;
