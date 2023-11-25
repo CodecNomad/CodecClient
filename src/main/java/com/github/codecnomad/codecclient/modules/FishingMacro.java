@@ -17,9 +17,9 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
+import net.minecraft.entity.passive.EntitySquid;
 import net.minecraft.entity.projectile.EntityFishHook;
-import net.minecraft.item.ItemFishingRod;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.network.play.server.*;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
@@ -43,7 +43,9 @@ public class FishingMacro extends Module {
         LOOK_TO_NEW_BLOCK,
         CAST_HOOK,
         WAIT_FOR_CATCH,
-        CATCH
+        CATCH,
+        KILL_DELAY,
+        KILL_MONSTER
     }
     public FishingSteps currentStep = FishingSteps.FIND_ROD;
 
@@ -53,6 +55,7 @@ public class FishingMacro extends Module {
 
     Entity fishingHook = null;
     Entity fishingMarker = null;
+    Entity fishingMonster = null;
 
     List<BlockPos> waterBlocks = new ArrayList<>();
     BlockPos currentWaterBlock = null;
@@ -71,6 +74,7 @@ public class FishingMacro extends Module {
         failSafe = false;
         fishingHook = null;
         fishingMarker = null;
+        fishingMonster = null;
         waterBlocks.clear();
         currentWaterBlock = null;
     }
@@ -84,9 +88,9 @@ public class FishingMacro extends Module {
 
         switch (currentStep) {
             case FIND_WATER: {
-                for (int x = -4; x <= 4; x++) {
+                for (int x = -8; x <= 8; x++) {
                     for (int y = -1; y <= 1; y++) {
-                        for (int z = -4; z <= 4; z++) {
+                        for (int z = -8; z <= 8; z++) {
                             BlockPos pos = new BlockPos(
                                     CodecClient.mc.thePlayer.posX + x,
                                     CodecClient.mc.thePlayer.posY + y,
@@ -97,7 +101,7 @@ public class FishingMacro extends Module {
 
                             if ((block instanceof BlockStaticLiquid || block instanceof BlockDynamicLiquid)
                                     && CodecClient.mc.theWorld.rayTraceBlocks(
-                                    new Vec3(CodecClient.mc.thePlayer.posX, CodecClient.mc.thePlayer.posY + CodecClient.mc.thePlayer.getEyeHeight(), CodecClient.mc.thePlayer.posZ),
+                                    new Vec3(CodecClient.mc.thePlayer.posX, CodecClient.mc.thePlayer.posY + CodecClient.mc.thePlayer.getEyeHeight() / 2, CodecClient.mc.thePlayer.posZ),
                                     new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5),
                                     false, true, false
                             ) == null) {
@@ -156,7 +160,7 @@ public class FishingMacro extends Module {
 
             case WAIT_FOR_CATCH:
             {
-                if (MainCounter.countUntil(10)) {
+                if (MainCounter.countUntil(15)) {
                     return;
                 }
 
@@ -183,7 +187,45 @@ public class FishingMacro extends Module {
             case CATCH: {
                 CodecClient.mc.playerController.sendUseItem(CodecClient.mc.thePlayer, CodecClient.mc.thePlayer.getEntityWorld(), CodecClient.mc.thePlayer.inventory.getCurrentItem());
 
-                currentStep = FishingSteps.FIND_ROD;
+                currentStep = FishingSteps.KILL_DELAY;
+            }
+
+            case KILL_DELAY: {
+                if (MainCounter.countUntil(20)) {
+                    return;
+                }
+
+                currentStep = FishingSteps.KILL_MONSTER;
+            }
+
+            case KILL_MONSTER: {
+                if (fishingMonster == null || !fishingMonster.isEntityAlive()) {
+                    currentStep = FishingSteps.FIND_ROD;
+                    fishingMonster = null;
+                    return;
+                }
+
+                for (int slotIndex = 0; slotIndex < CodecClient.mc.thePlayer.inventory.getSizeInventory(); slotIndex++) {
+                    ItemStack stack = CodecClient.mc.thePlayer.inventory.getStackInSlot(slotIndex);
+                    if (stack != null &&
+                        (
+                            stack.getItem() instanceof ItemSpade ||
+                            stack.getItem() instanceof ItemSword ||
+                            stack.getItem() instanceof ItemAxe
+                        )
+                    ) {
+                        CodecClient.mc.thePlayer.inventory.currentItem = slotIndex;
+                        break;
+                    }
+                }
+
+                CodecClient.rotation.setYaw((float) (MathUtils.getYaw(fishingMonster.getPosition()) -1 + Math.random() * 2), 4);
+                CodecClient.rotation.setPitch((float) (MathUtils.getPitch(fishingMonster.getPosition().add(0, fishingMonster.getEyeHeight(), 0)) -1 + Math.random() * 2), 4);
+
+                if (!MainCounter.countUntil(3)) {
+                    MainCounter.add(Math.random() * 100 > 70 ? 1 : 0);
+                    KeyBinding.onTick(CodecClient.mc.gameSettings.keyBindAttack.getKeyCode());
+                }
             }
         }
     }
@@ -206,8 +248,21 @@ public class FishingMacro extends Module {
 
     @SubscribeEvent
     public void entitySpawn(EntityJoinWorldEvent event) {
-        if (event.entity instanceof EntityArmorStand) {
+        if (fishingHook == null || event.entity instanceof EntitySquid) {
+            return;
+        }
+
+        if (fishingMarker == null && event.entity instanceof EntityArmorStand && event.entity.getDistanceToEntity(fishingHook) <= 8) {
             fishingMarker = event.entity;
+            return;
+        }
+
+        if (fishingMonster == null &&
+            event.entity.getDistanceToEntity(fishingHook) <= 1.1 &&
+            event.entity.getDistanceToEntity(fishingHook) >= 0.8 &&
+            !event.entity.getName().equals("item.tile.stone.stone")
+        ) {
+            fishingMonster = event.entity;
         }
     }
 
