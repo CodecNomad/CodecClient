@@ -5,6 +5,10 @@ import net.minecraftforge.common.MinecraftForge;
 public class Module {
     public boolean state;
 
+    public Module() {
+//        this.register();
+    }
+
     public void register() {
         MinecraftForge.EVENT_BUS.register(this);
         this.state = true;
@@ -13,9 +17,5 @@ public class Module {
     public void unregister() {
         MinecraftForge.EVENT_BUS.unregister(this);
         this.state = false;
-    }
-
-    public Module() {
-//        this.register();
     }
 }

@@ -6,12 +6,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class Rotation {
-    private float yawGoal = 0;
-    private float pitchGoal = 0;
-
     public boolean updateYaw = false;
     public boolean updatePitch = false;
-
+    private float yawGoal = 0;
+    private float pitchGoal = 0;
     private int yawSmooth;
     private int pitchSmooth;
 

@@ -15,7 +15,10 @@ public class Counter {
     public void add(int numberToAdd) {
         count += numberToAdd;
     }
-    public int get() { return count; }
+
+    public int get() {
+        return count;
+    }
 
     public void reset() {
         count = 0;

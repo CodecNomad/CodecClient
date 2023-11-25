@@ -9,23 +9,6 @@ import java.io.File;
 
 public class Config extends Vigilant {
     public static boolean state = false;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "EntityEsp",
-            category = "EntityEsp",
-            subcategory = "Config"
-    )
-    private boolean EntityEsp = CodecClient.modules.get("EntityEsp").state;
-
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "FishingMacro",
-            category = "FishingMacro",
-            subcategory = "Config"
-    )
-    private boolean FishingMacro = CodecClient.modules.get("FishingMacro").state;
-
     @Property(
             type = PropertyType.TEXT,
             name = "Entities",
@@ -34,7 +17,6 @@ public class Config extends Vigilant {
             subcategory = "Config"
     )
     public static String EntityEspWhitelist = "Armor Stand;Anita";
-
     @Property(
             type = PropertyType.DECIMAL_SLIDER,
             minF = 0,
@@ -65,15 +47,30 @@ public class Config extends Vigilant {
     @Property(
             type = PropertyType.DECIMAL_SLIDER,
             minF = 0.1f,
-            maxF= 1.f,
+            maxF = 1.f,
             name = "Width",
             category = "EntityEsp",
             subcategory = "Looks/Size"
     )
     public static float EntityEspWidth = 0.5f;
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "EntityEsp",
+            category = "EntityEsp",
+            subcategory = "Config"
+    )
+    private boolean EntityEsp = CodecClient.modules.get("EntityEsp").state;
+    @Property(
+            type = PropertyType.SWITCH,
+            name = "FishingMacro",
+            category = "FishingMacro",
+            subcategory = "Config"
+    )
+    private boolean FishingMacro = CodecClient.modules.get("FishingMacro").state;
 
     public Config() {
         super(new File("./CodecClient.toml"));
+        initialize();
         this.registerListener("EntityEsp", newState -> toggle("EntityEsp", (Boolean) newState));
         this.registerListener("FishingMacro", newState -> toggle("FishingMacro", (Boolean) newState));
     }

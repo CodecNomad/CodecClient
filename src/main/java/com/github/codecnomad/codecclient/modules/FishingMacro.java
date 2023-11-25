@@ -35,28 +35,14 @@ import java.util.List;
 
 public class FishingMacro extends Module {
 
-    public static final String[] FAILSAFE_TEXT = new String[] {"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "j g gdrw hwtf", "can i get friend request??", "henlo i'm here",};
-
-    public enum FishingSteps {
-        FIND_WATER,
-        FIND_ROD,
-        LOOK_TO_NEW_BLOCK,
-        CAST_HOOK,
-        WAIT_FOR_CATCH,
-        CATCH,
-        KILL_DELAY,
-        KILL_MONSTER
-    }
+    public static final String[] FAILSAFE_TEXT = new String[]{"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "j g gdrw hwtf", "can i get friend request??", "henlo i'm here",};
     public FishingSteps currentStep = FishingSteps.FIND_ROD;
-
     public Counter MainCounter = new Counter();
     public Counter FailsafeCounter = new Counter();
     public boolean failSafe = false;
-
     Entity fishingHook = null;
     Entity fishingMarker = null;
     Entity fishingMonster = null;
-
     List<BlockPos> waterBlocks = new ArrayList<>();
     BlockPos currentWaterBlock = null;
 
@@ -78,7 +64,6 @@ public class FishingMacro extends Module {
         waterBlocks.clear();
         currentWaterBlock = null;
     }
-
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
@@ -140,8 +125,8 @@ public class FishingMacro extends Module {
 
                 BlockPos randomWater = waterBlocks.get((int) (Math.random() * waterBlocks.size()));
                 currentWaterBlock = randomWater;
-                CodecClient.rotation.setYaw((float) (MathUtils.getYaw(randomWater) -2 + Math.random() * 3), 4);
-                CodecClient.rotation.setPitch((float) (MathUtils.getPitch(randomWater) -2 + Math.random() * 3), 4);
+                CodecClient.rotation.setYaw((float) (MathUtils.getYaw(randomWater) - 2 + Math.random() * 3), 4);
+                CodecClient.rotation.setPitch((float) (MathUtils.getPitch(randomWater) - 2 + Math.random() * 3), 4);
 
                 currentStep = FishingSteps.CAST_HOOK;
                 return;
@@ -158,8 +143,7 @@ public class FishingMacro extends Module {
                 return;
             }
 
-            case WAIT_FOR_CATCH:
-            {
+            case WAIT_FOR_CATCH: {
                 if (MainCounter.countUntil(15)) {
                     return;
                 }
@@ -208,19 +192,19 @@ public class FishingMacro extends Module {
                 for (int slotIndex = 0; slotIndex < CodecClient.mc.thePlayer.inventory.getSizeInventory(); slotIndex++) {
                     ItemStack stack = CodecClient.mc.thePlayer.inventory.getStackInSlot(slotIndex);
                     if (stack != null &&
-                        (
-                            stack.getItem() instanceof ItemSpade ||
-                            stack.getItem() instanceof ItemSword ||
-                            stack.getItem() instanceof ItemAxe
-                        )
+                            (
+                                    stack.getItem() instanceof ItemSpade ||
+                                            stack.getItem() instanceof ItemSword ||
+                                            stack.getItem() instanceof ItemAxe
+                            )
                     ) {
                         CodecClient.mc.thePlayer.inventory.currentItem = slotIndex;
                         break;
                     }
                 }
 
-                CodecClient.rotation.setYaw((float) (MathUtils.getYaw(fishingMonster.getPosition()) -1 + Math.random() * 2), 4);
-                CodecClient.rotation.setPitch((float) (MathUtils.getPitch(fishingMonster.getPosition().add(0, fishingMonster.getEyeHeight(), 0)) -1 + Math.random() * 2), 4);
+                CodecClient.rotation.setYaw((float) (MathUtils.getYaw(fishingMonster.getPosition()) - 1 + Math.random() * 2), 4);
+                CodecClient.rotation.setPitch((float) (MathUtils.getPitch(fishingMonster.getPosition().add(0, fishingMonster.getEyeHeight(), 0)) - 1 + Math.random() * 2), 4);
 
                 if (!MainCounter.countUntil(3)) {
                     MainCounter.add(Math.random() * 100 > 70 ? 1 : 0);
@@ -258,9 +242,9 @@ public class FishingMacro extends Module {
         }
 
         if (fishingMonster == null &&
-            event.entity.getDistanceToEntity(fishingHook) <= 1.1 &&
-            event.entity.getDistanceToEntity(fishingHook) >= 0.8 &&
-            !event.entity.getName().equals("item.tile.stone.stone")
+                event.entity.getDistanceToEntity(fishingHook) <= 1.1 &&
+                event.entity.getDistanceToEntity(fishingHook) >= 0.8 &&
+                !event.entity.getName().equals("item.tile.stone.stone")
         ) {
             fishingMonster = event.entity;
         }
@@ -270,16 +254,16 @@ public class FishingMacro extends Module {
     public void packetReceive(PacketEvent.ReceiveEvent event) {
         if (
                 event.packet instanceof S08PacketPlayerPosLook ||
-                event.packet instanceof S09PacketHeldItemChange ||
-                (
-                    event.packet instanceof S19PacketEntityHeadLook && ((S19Accessor) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
-                ) ||
-                (
-                    event.packet instanceof S1BPacketEntityAttach && ((S1BPacketEntityAttach) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
-                ) ||
-                (
-                    event.packet instanceof S18PacketEntityTeleport && ((S18PacketEntityTeleport) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
-                )
+                        event.packet instanceof S09PacketHeldItemChange ||
+                        (
+                                event.packet instanceof S19PacketEntityHeadLook && ((S19Accessor) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
+                        ) ||
+                        (
+                                event.packet instanceof S1BPacketEntityAttach && ((S1BPacketEntityAttach) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
+                        ) ||
+                        (
+                                event.packet instanceof S18PacketEntityTeleport && ((S18PacketEntityTeleport) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
+                        )
         ) {
             ChatUtils.sendMessage("Disabled macro -> failsafe has been triggered");
             CodecClient.rotation.reset();
@@ -341,5 +325,16 @@ public class FishingMacro extends Module {
             failSafe = false;
             this.unregister();
         }
+    }
+
+    public enum FishingSteps {
+        FIND_WATER,
+        FIND_ROD,
+        LOOK_TO_NEW_BLOCK,
+        CAST_HOOK,
+        WAIT_FOR_CATCH,
+        CATCH,
+        KILL_DELAY,
+        KILL_MONSTER
     }
 }

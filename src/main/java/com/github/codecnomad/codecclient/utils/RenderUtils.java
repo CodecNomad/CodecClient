@@ -1,10 +1,6 @@
 package com.github.codecnomad.codecclient.utils;
 
-import java.awt.Color;
-
 import com.github.codecnomad.codecclient.CodecClient;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -15,13 +11,14 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 
 public class RenderUtils {
+    private static final ResourceLocation IMAGE_TEXTURE = new ResourceLocation("skyblockfeatures", "path_arrow.png");
+
     public static void drawOutlinedFilledBoundingBox(AxisAlignedBB aabb, Color color, float partialTicks) {
         aabb = aabb.offset(-0.001, -0.001, -0.001);
         aabb = aabb.expand(0.002, 0.002, 0.002);
@@ -30,33 +27,34 @@ public class RenderUtils {
         GlStateManager.disableTexture2D();
         GlStateManager.depthMask(false);
 
-        double width = Math.max(1-(CodecClient.mc.thePlayer.getDistance(aabb.minX, aabb.minY, aabb.minZ)/10-2),2);
+        double width = Math.max(1 - (CodecClient.mc.thePlayer.getDistance(aabb.minX, aabb.minY, aabb.minZ) / 10 - 2), 2);
         RenderUtils.drawBoundingBox(aabb, color, partialTicks);
-        RenderUtils.drawOutlinedBoundingBox(aabb.offset(-0.001, -0.001, -0.001).expand(0.002, 0.002, 0.002), color, (float)width, partialTicks);
+        RenderUtils.drawOutlinedBoundingBox(aabb.offset(-0.001, -0.001, -0.001).expand(0.002, 0.002, 0.002), color, (float) width, partialTicks);
         GlStateManager.depthMask(true);
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
+
     public static void drawOutlinedFilledBoundingBox(BlockPos pos, Color color, float partialTicks) {
-        AxisAlignedBB aabb = new AxisAlignedBB(pos,pos.add(1, 1, 1));
-        drawOutlinedFilledBoundingBox(aabb,color,partialTicks);
+        AxisAlignedBB aabb = new AxisAlignedBB(pos, pos.add(1, 1, 1));
+        drawOutlinedFilledBoundingBox(aabb, color, partialTicks);
     }
-    public static void drawWaypoint(BlockPos pos,Color color,String label,float partialTicks,boolean throughWalls) {
+
+    public static void drawWaypoint(BlockPos pos, Color color, String label, float partialTicks, boolean throughWalls) {
         // Beacon
-        AxisAlignedBB aabb2 = new AxisAlignedBB(pos.getX()+0.5, pos.getY()+1, pos.getZ()+0.5, pos.getX()+0.5, pos.getY()+100, pos.getZ()+0.5);
+        AxisAlignedBB aabb2 = new AxisAlignedBB(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, pos.getX() + 0.5, pos.getY() + 100, pos.getZ() + 0.5);
 
         GlStateManager.pushMatrix();
         GlStateManager.pushAttrib();
-        if(throughWalls) GlStateManager.disableDepth();
+        if (throughWalls) GlStateManager.disableDepth();
         drawOutlinedFilledBoundingBox(aabb2, color, partialTicks);
-        drawOutlinedFilledBoundingBox(pos,color,partialTicks);
-        renderWaypointText(pos.add(0, 3, 0),label);
-        if(throughWalls) GlStateManager.enableDepth();
+        drawOutlinedFilledBoundingBox(pos, color, partialTicks);
+        renderWaypointText(pos.add(0, 3, 0), label);
+        if (throughWalls) GlStateManager.enableDepth();
         GlStateManager.popAttrib();
         GlStateManager.popMatrix();
     }
-
 
     public static void renderWaypointText(BlockPos pos, String text) {
         double x = pos.getX() + 0.5 - CodecClient.mc.getRenderManager().viewerPosX;
@@ -146,7 +144,7 @@ public class RenderUtils {
         float f = 1.6F;
         float f1 = 0.016666668F * f;
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float)x + 0.0F, (float)y, (float)z);
+        GlStateManager.translate((float) x + 0.0F, (float) y, (float) z);
         GL11.glNormal3f(0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
@@ -198,7 +196,7 @@ public class RenderUtils {
         GlStateManager.popMatrix();
     }
 
-    public static void drawBoundingBox(AxisAlignedBB aa,Color c, float partialTicks) {
+    public static void drawBoundingBox(AxisAlignedBB aa, Color c, float partialTicks) {
         Entity render = Minecraft.getMinecraft().getRenderViewEntity();
         aa = aa.offset(-0.002, -0.001, -0.002);
         aa = aa.expand(0.004, 0.005, 0.004);
@@ -216,11 +214,11 @@ public class RenderUtils {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldRenderer = tessellator.getWorldRenderer();
         int color = c.getRGB();
-        float a = (float)(color >> 24 & 255) / 255.0F;
-        a = (float)((double)a * 0.15D);
-        float r = (float)(color >> 16 & 255) / 255.0F;
-        float g = (float)(color >> 8 & 255) / 255.0F;
-        float b = (float)(color & 255) / 255.0F;
+        float a = (float) (color >> 24 & 255) / 255.0F;
+        a = (float) ((double) a * 0.15D);
+        float r = (float) (color >> 16 & 255) / 255.0F;
+        float g = (float) (color >> 8 & 255) / 255.0F;
+        float b = (float) (color & 255) / 255.0F;
         worldRenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
         worldRenderer.pos(aa.minX, aa.maxY, aa.minZ).color(r, g, b, a).endVertex();
         worldRenderer.pos(aa.minX, aa.minY, aa.minZ).color(r, g, b, a).endVertex();
@@ -293,6 +291,7 @@ public class RenderUtils {
     /**
      * Taken from Danker's Skyblock Mod under GPL 3.0 license
      * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     *
      * @author bowser0000
      */
     public static void draw3DLine(Vec3 pos1, Vec3 pos2, int width, Color color, float partialTicks) {
@@ -347,8 +346,6 @@ public class RenderUtils {
         }
     }
 
-
-    private static final ResourceLocation IMAGE_TEXTURE = new ResourceLocation("skyblockfeatures", "path_arrow.png");
     public static void drawImageInWorld(Vec3 start, float pitch, float yaw, Color color) {
         Minecraft mc = Minecraft.getMinecraft();
         double x = start.xCoord;

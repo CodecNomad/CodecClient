@@ -8,6 +8,7 @@ public class MathUtils {
     public static float easeInOut(float t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
+
     public static float interpolate(float goal, float current, float time) {
         float t = easeInOut(time);
         return current + (goal - current) * t;

@@ -48,16 +48,16 @@ public class EntityEsp extends Module {
             GlStateManager.disableDepth();
             AxisAlignedBB entityBB = entity.getEntityBoundingBox();
             RenderUtils.drawOutlinedFilledBoundingBox(
-                new AxisAlignedBB(
-                    entityBB.minX - Config.EntityEspWidth,
-                    entityBB.minY,
-                    entityBB.minZ - Config.EntityEspWidth,
-                    entityBB.maxX + Config.EntityEspWidth,
-                    entityBB.maxY,
-                    entityBB.maxZ + Config.EntityEspWidth
-                ),
-                Color.getHSBColor(Config.EntityEspColorH, Config.EntityEspColorS, Config.EntityEspColorB),
-                event.partialTicks
+                    new AxisAlignedBB(
+                            entityBB.minX - Config.EntityEspWidth,
+                            entityBB.minY,
+                            entityBB.minZ - Config.EntityEspWidth,
+                            entityBB.maxX + Config.EntityEspWidth,
+                            entityBB.maxY,
+                            entityBB.maxZ + Config.EntityEspWidth
+                    ),
+                    Color.getHSBColor(Config.EntityEspColorH, Config.EntityEspColorS, Config.EntityEspColorB),
+                    event.partialTicks
             );
             GlStateManager.enableDepth();
         }
