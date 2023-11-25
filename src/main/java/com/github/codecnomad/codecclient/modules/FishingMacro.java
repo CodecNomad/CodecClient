@@ -144,7 +144,7 @@ public class FishingMacro extends Module {
             }
 
             case WAIT_FOR_CATCH: {
-                if (MainCounter.countUntil(15)) {
+                if (MainCounter.countUntil(10)) {
                     return;
                 }
 
@@ -241,7 +241,6 @@ public class FishingMacro extends Module {
             return;
         }
 
-        ChatUtils.sendMessage(event.entity + " " + event.entity.getDistanceToEntity(fishingHook));
         if (fishingMonster == null &&
                 event.entity.getDistanceToEntity(fishingHook) <= 1.2 &&
                 event.entity.getDistanceToEntity(fishingHook) >= 0.8 &&
