@@ -236,13 +236,14 @@ public class FishingMacro extends Module {
             return;
         }
 
-        if (fishingMarker == null && event.entity instanceof EntityArmorStand && event.entity.getDistanceToEntity(fishingHook) <= 8) {
+        if (event.entity instanceof EntityArmorStand && event.entity.getDistanceToEntity(fishingHook) <= 8) {
             fishingMarker = event.entity;
             return;
         }
 
+        ChatUtils.sendMessage(event.entity + " " + event.entity.getDistanceToEntity(fishingHook));
         if (fishingMonster == null &&
-                event.entity.getDistanceToEntity(fishingHook) <= 1.1 &&
+                event.entity.getDistanceToEntity(fishingHook) <= 1.2 &&
                 event.entity.getDistanceToEntity(fishingHook) >= 0.8 &&
                 !event.entity.getName().equals("item.tile.stone.stone")
         ) {
