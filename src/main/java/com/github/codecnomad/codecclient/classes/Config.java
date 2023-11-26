@@ -1,7 +1,9 @@
 package com.github.codecnomad.codecclient.classes;
 
+import cc.polyfrost.oneconfig.config.annotations.Color;
 import cc.polyfrost.oneconfig.config.annotations.KeyBind;
 import cc.polyfrost.oneconfig.config.annotations.Number;
+import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
@@ -9,6 +11,12 @@ import com.github.codecnomad.codecclient.CodecClient;
 import org.lwjgl.input.Keyboard;
 
 public class Config extends cc.polyfrost.oneconfig.config.Config {
+    @Color(
+            name = "Color",
+            category = "Visuals"
+    )
+    public static OneColor VisualColor = new OneColor(100, 60, 160, 200);
+
     @KeyBind(
             name = "Fishing keybind",
             category = "Macros",

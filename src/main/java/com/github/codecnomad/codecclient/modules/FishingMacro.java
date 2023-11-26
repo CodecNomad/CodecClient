@@ -29,7 +29,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -220,7 +219,7 @@ public class FishingMacro extends Module {
             GlStateManager.disableDepth();
             RenderUtils.drawOutlinedFilledBoundingBox(
                     currentWaterBlock,
-                    new Color(155, 155, 0, 200),
+                    Config.VisualColor.toJavaColor(),
                     event.partialTicks);
             GlStateManager.enableDepth();
         }

@@ -4,8 +4,6 @@ plugins {
     id("cc.polyfrost.loom") version "0.10.0.+"
     id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.freefair.lombok") version "8.4"
-    id("net.kyori.blossom") version "1.3.1"
 }
 
 //Constants:
@@ -22,10 +20,6 @@ java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 }
 
-blossom {
-    replaceToken("%%VERSION%%", version)
-}
-
 // Minecraft configuration:
 loom {
     log4jConfigs.from(file("log4j2.xml"))
@@ -35,8 +29,6 @@ loom {
             property("mixin.debug", "true")
             property("asmhelper.verbose", "true")
             arg("--tweakClass", "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker")
-//            arg("-Dfml.coreMods.load", "com.jelly.farmhelperv2.transformer.FMLCore")
-//            arg("--tweakClass", "com.jelly.farmhelperv2.transformer.Tweaker")
         }
     }
     forge {
