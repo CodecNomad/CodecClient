@@ -1,86 +1,60 @@
 package com.github.codecnomad.codecclient.classes;
 
+import cc.polyfrost.oneconfig.config.annotations.KeyBind;
+import cc.polyfrost.oneconfig.config.annotations.Number;
+import cc.polyfrost.oneconfig.config.core.OneKeyBind;
+import cc.polyfrost.oneconfig.config.data.Mod;
+import cc.polyfrost.oneconfig.config.data.ModType;
 import com.github.codecnomad.codecclient.CodecClient;
-import gg.essential.vigilance.Vigilant;
-import gg.essential.vigilance.data.Property;
-import gg.essential.vigilance.data.PropertyType;
+import org.lwjgl.input.Keyboard;
 
-import java.io.File;
+public class Config extends cc.polyfrost.oneconfig.config.Config {
+    @KeyBind(
+            name = "Fishing keybind",
+            category = "Macros",
+            subcategory = "Fishing"
+    )
+    public static OneKeyBind FishingKeybinding = new OneKeyBind(Keyboard.KEY_F);
 
-public class Config extends Vigilant {
-    public static boolean state = false;
-    @Property(
-            type = PropertyType.TEXT,
-            name = "Entities",
-            description = "These are based on the mob names, Use: Item1;Item2",
-            category = "EntityEsp",
-            subcategory = "Config"
+    @Number(
+            name = "Catch delay",
+            category = "Macros",
+            subcategory = "Fishing",
+            min = 1,
+            max = 10
     )
-    public static String EntityEspWhitelist = "Armor Stand;Anita";
-    @Property(
-            type = PropertyType.DECIMAL_SLIDER,
-            minF = 0,
-            maxF = 360,
-            name = "Hue",
-            category = "All Esp",
-            subcategory = "Looks/Color"
+    public static int FishingDelay = 10;
+
+    @Number(
+            name = "Kill delay",
+            category = "Macros",
+            subcategory = "Fishing",
+            min = 1,
+            max = 40
     )
-    public static float EntityEspColorH = 200;
-    @Property(
-            type = PropertyType.DECIMAL_SLIDER,
-            minF = 0,
-            maxF = 360,
-            name = "Saturation",
-            category = "All Esp",
-            subcategory = "Looks/Color"
+    public static int KillDelay = 20;
+
+    @Number(
+            name = "Attack c/s",
+            category = "Macros",
+            subcategory = "Fishing",
+            min = 5,
+            max = 20
     )
-    public static float EntityEspColorS = 80;
-    @Property(
-            type = PropertyType.DECIMAL_SLIDER,
-            minF = 0,
-            maxF = 360,
-            name = "Brightness",
-            category = "All Esp",
-            subcategory = "Looks/Color"
-    )
-    public static float EntityEspColorB = 100;
-    @Property(
-            type = PropertyType.DECIMAL_SLIDER,
-            minF = 0.1f,
-            maxF = 1.f,
-            name = "Width",
-            category = "EntityEsp",
-            subcategory = "Looks/Size"
-    )
-    public static float EntityEspWidth = 0.5f;
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "EntityEsp",
-            category = "EntityEsp",
-            subcategory = "Config"
-    )
-    private boolean EntityEsp = CodecClient.modules.get("EntityEsp").state;
-    @Property(
-            type = PropertyType.SWITCH,
-            name = "FishingMacro",
-            category = "FishingMacro",
-            subcategory = "Config"
-    )
-    private boolean FishingMacro = CodecClient.modules.get("FishingMacro").state;
+    public static int AttackCps = 10;
 
     public Config() {
-        super(new File("./CodecClient.toml"));
+        super(new Mod("codecclient", ModType.UTIL_QOL), "config.json");
+        this.registerKeyBind(FishingKeybinding, () -> toggle("FishingMacro"));
         initialize();
-        this.registerListener("EntityEsp", newState -> toggle("EntityEsp", (Boolean) newState));
-        this.registerListener("FishingMacro", newState -> toggle("FishingMacro", (Boolean) newState));
     }
 
-    private void toggle(String name, Boolean state) {
+    private static void toggle(String name) {
         Module module = CodecClient.modules.get(name);
-        if (state) {
-            module.register();
-        } else {
+        if (module.state) {
             module.unregister();
+        } else {
+            module.register();
         }
     }
 }

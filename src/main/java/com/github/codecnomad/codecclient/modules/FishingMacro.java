@@ -144,7 +144,7 @@ public class FishingMacro extends Module {
             }
 
             case WAIT_FOR_CATCH: {
-                if (MainCounter.countUntil(10)) {
+                if (MainCounter.countUntil(Config.FishingDelay)) {
                     return;
                 }
 
@@ -175,7 +175,7 @@ public class FishingMacro extends Module {
             }
 
             case KILL_DELAY: {
-                if (MainCounter.countUntil(20)) {
+                if (MainCounter.countUntil(Config.KillDelay)) {
                     return;
                 }
 
@@ -183,8 +183,7 @@ public class FishingMacro extends Module {
             }
 
             case KILL_MONSTER: {
-                if (fishingMonster == null || !fishingMonster.isEntityAlive() || !CodecClient.mc.thePlayer.canEntityBeSeen(fishingMonster))
-                {
+                if (fishingMonster == null || !fishingMonster.isEntityAlive() || !CodecClient.mc.thePlayer.canEntityBeSeen(fishingMonster)) {
                     currentStep = FishingSteps.FIND_ROD;
                     fishingMonster = null;
                     return;
@@ -207,7 +206,7 @@ public class FishingMacro extends Module {
                 CodecClient.rotation.setYaw((float) (MathUtils.getYaw(fishingMonster.getPosition()) - 1 + Math.random() * 2), 4);
                 CodecClient.rotation.setPitch((float) (MathUtils.getPitch(fishingMonster.getPosition().add(0, fishingMonster.getEyeHeight(), 0)) - 1 + Math.random() * 2), 4);
 
-                if (!MainCounter.countUntil(3)) {
+                if (!MainCounter.countUntil(20 / Config.AttackCps)) {
                     MainCounter.add(Math.random() * 100 > 70 ? 1 : 0);
                     KeyBinding.onTick(CodecClient.mc.gameSettings.keyBindAttack.getKeyCode());
                 }
@@ -221,11 +220,7 @@ public class FishingMacro extends Module {
             GlStateManager.disableDepth();
             RenderUtils.drawOutlinedFilledBoundingBox(
                     currentWaterBlock,
-                    Color.getHSBColor(
-                            Config.EntityEspColorH,
-                            Config.EntityEspColorS,
-                            Config.EntityEspColorB
-                    ),
+                    new Color(155, 155, 0, 200),
                     event.partialTicks);
             GlStateManager.enableDepth();
         }

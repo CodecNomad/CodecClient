@@ -1,5 +1,3 @@
-import org.apache.commons.lang3.SystemUtils
-
 plugins {
     idea
     java
@@ -10,8 +8,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-//Constants:
-
+// Constants...
 val baseGroup: String by project
 val mcVersion: String by project
 val version: String by project
@@ -20,53 +17,31 @@ val modid: String by project
 val mcPlatform: String by project
 val buildNumber: String by project
 
-// Toolchains:
+// Toolchains...
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
 }
 
-// Minecraft configuration:
+// Minecraft configuration...
 loom {
     log4jConfigs.from(file("log4j2.xml"))
     launchConfigs {
         "client" {
-            // If you don't want mixins, remove these lines
-            property("mixin.debug", "true")
-            property("asmhelper.verbose", "true")
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-        }
-    }
-    runConfigs {
-        "client" {
-            if (SystemUtils.IS_OS_MAC_OSX) {
-                // This argument causes a crash on macOS
-                vmArgs.remove("-XstartOnFirstThread")
-            }
+            arg("--tweakClass", "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker")
         }
         remove(getByName("server"))
     }
-    forge {
-        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        // If you don't want mixins, remove this lines
-        mixinConfig("mixins.$modid.json")
-    }
-    // If you don't want mixins, remove these lines
-    mixin {
-        defaultRefmapName.set("mixins.$modid.refmap.json")
-    }
+    // Rest of your loom configuration...
 }
 
 sourceSets.main {
     output.setResourcesDir(sourceSets.main.flatMap { it.java.classesDirectory })
 }
 
-// Dependencies:
-
+// Dependencies...
 repositories {
     mavenCentral()
     maven("https://repo.spongepowered.org/maven/")
-    // If you don't want to log in with your real minecraft account, remove this line
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     maven("https://repo.essential.gg/repository/maven-public")
 }
 
@@ -79,20 +54,15 @@ dependencies {
     mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
-    // If you don't want mixins, remove these lines
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
 
-    // If you don't want to log in with your real minecraft account, remove this line
     runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.2")
-
-    implementation("gg.essential:vigilance-$mcVersion-$mcPlatform:$buildNumber")
 }
 
-// Tasks:
-
+// Tasks...
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
 }
@@ -102,8 +72,6 @@ tasks.withType(Jar::class) {
     manifest.attributes.run {
         this["FMLCorePluginContainsFMLMod"] = "true"
         this["ForceLoadAsMod"] = "true"
-
-        // If you don't want mixins, remove these lines
         this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
         this["MixinConfigs"] = "mixins.$modid.json"
     }
@@ -121,7 +89,6 @@ tasks.processResources {
 
     rename("(.+_at.cfg)", "META-INF/$1")
 }
-
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
     archiveClassifier.set("")
@@ -143,10 +110,32 @@ tasks.shadowJar {
             println("Copying jars into mod: ${it.files}")
         }
     }
-
-    // If you want to include other dependencies and shadow them, you can relocate them in here
     fun relocate(name: String) = relocate(name, "$baseGroup.deps.$name")
 }
 
 tasks.assemble.get().dependsOn(tasks.remapJar)
 
+// Add the OneConfig repository
+repositories {
+    maven("https://repo.polyfrost.cc/releases")
+}
+
+// Update dependencies to include OneConfig
+dependencies {
+    compileOnly("cc.polyfrost:oneconfig-1.8.9-forge:0.2.1-alpha+") // Won't be included in the JAR
+    implementation("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta+") // Should be included in the JAR
+}
+
+// Update the tasks
+tasks.jar {
+    archiveClassifier.set("without-deps")
+    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+    manifest.attributes.apply {
+        "ModSide" to "CLIENT"
+        "TweakOrder" to 0
+        "ForceLoadAsMod" to true
+        "TweakClass" to "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker"
+    }
+}
+
+// Rest of your tasks...
