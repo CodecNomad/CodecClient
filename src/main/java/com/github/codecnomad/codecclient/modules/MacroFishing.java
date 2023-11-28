@@ -1,7 +1,7 @@
 package com.github.codecnomad.codecclient.modules;
 
 import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.Guis.GuiConfig;
+import com.github.codecnomad.codecclient.guis.GuiConfig;
 import com.github.codecnomad.codecclient.classes.HelperClassCounter;
 import com.github.codecnomad.codecclient.classes.HelperClassModule;
 import com.github.codecnomad.codecclient.classes.HelperClassPacketEvent;

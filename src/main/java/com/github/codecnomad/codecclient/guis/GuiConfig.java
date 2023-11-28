@@ -1,4 +1,4 @@
-package com.github.codecnomad.codecclient.Guis;
+package com.github.codecnomad.codecclient.guis;
 
 import cc.polyfrost.oneconfig.config.annotations.Color;
 import cc.polyfrost.oneconfig.config.annotations.HUD;

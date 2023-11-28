@@ -1,6 +1,6 @@
 package com.github.codecnomad.codecclient;
 
-import com.github.codecnomad.codecclient.Guis.GuiConfig;
+import com.github.codecnomad.codecclient.guis.GuiConfig;
 import com.github.codecnomad.codecclient.classes.HelperClassModule;
 import com.github.codecnomad.codecclient.classes.HelperClassRotation;
 import com.github.codecnomad.codecclient.modules.MacroFishing;
