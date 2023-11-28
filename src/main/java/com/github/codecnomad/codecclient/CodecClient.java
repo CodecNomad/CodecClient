@@ -1,6 +1,6 @@
 package com.github.codecnomad.codecclient;
 
-import com.github.codecnomad.codecclient.classes.Config;
+import com.github.codecnomad.codecclient.Guis.Config;
 import com.github.codecnomad.codecclient.classes.Module;
 import com.github.codecnomad.codecclient.classes.Rotation;
 import com.github.codecnomad.codecclient.modules.FishingMacro;

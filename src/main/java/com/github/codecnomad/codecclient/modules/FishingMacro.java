@@ -1,7 +1,7 @@
 package com.github.codecnomad.codecclient.modules;
 
 import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.classes.Config;
+import com.github.codecnomad.codecclient.Guis.Config;
 import com.github.codecnomad.codecclient.classes.Counter;
 import com.github.codecnomad.codecclient.classes.Module;
 import com.github.codecnomad.codecclient.classes.PacketEvent;
@@ -23,6 +23,7 @@ import net.minecraft.item.*;
 import net.minecraft.network.play.server.*;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -31,9 +32,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 public class FishingMacro extends Module {
-
+    public static int startTime = 0;
+    public static int catches = 0;
+    public static float xpGain = 0;
     public static final String[] FAILSAFE_TEXT = new String[]{"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "j g gdrw hwtf", "can i get friend request??", "henlo i'm here",};
     public FishingSteps currentStep = FishingSteps.FIND_ROD;
     public Counter MainCounter = new Counter();
@@ -46,12 +50,24 @@ public class FishingMacro extends Module {
     BlockPos currentWaterBlock = null;
 
     @Override
+    public void register() {
+        MinecraftForge.EVENT_BUS.register(this);
+        this.state = true;
+
+        startTime = (int) Math.floor((double) System.currentTimeMillis() / 1000);
+    }
+
+    @Override
     public void unregister() {
         MinecraftForge.EVENT_BUS.unregister(this);
         this.state = false;
 
         CodecClient.rotation.updatePitch = false;
         CodecClient.rotation.updateYaw = false;
+
+        startTime = 0;
+        catches = 0;
+        xpGain = 0;
 
         currentStep = FishingSteps.FIND_WATER;
         MainCounter.reset();
@@ -62,6 +78,7 @@ public class FishingMacro extends Module {
         fishingMonster = null;
         waterBlocks.clear();
         currentWaterBlock = null;
+
     }
 
     @SubscribeEvent
@@ -171,6 +188,7 @@ public class FishingMacro extends Module {
                 CodecClient.mc.playerController.sendUseItem(CodecClient.mc.thePlayer, CodecClient.mc.thePlayer.getEntityWorld(), CodecClient.mc.thePlayer.inventory.getCurrentItem());
 
                 currentStep = FishingSteps.KILL_DELAY;
+                catches++;
             }
 
             case KILL_DELAY: {
@@ -237,11 +255,23 @@ public class FishingMacro extends Module {
         }
 
         if (fishingMonster == null &&
-                event.entity.getDistanceToEntity(fishingHook) <= 1.2 &&
-                event.entity.getDistanceToEntity(fishingHook) >= 0.8 &&
+                event.entity.getDistanceToEntity(fishingHook) <= 1.25 &&
+                event.entity.getDistanceToEntity(fishingHook) >= 0.75 &&
                 !event.entity.getName().equals("item.tile.stone.stone")
         ) {
             fishingMonster = event.entity;
+        }
+    }
+
+    @SubscribeEvent
+    public void chatReceive(ClientChatReceivedEvent event) {
+        if (event.type != 2) {
+            return;
+        }
+
+        Matcher matcher = ChatUtils.FishingSkillPattern.matcher(event.message.getFormattedText());
+        if (matcher.find()){
+            xpGain += Float.parseFloat(matcher.group(1));
         }
     }
 
