@@ -41,10 +41,15 @@ public class UtilMath {
         double deltaZ = blockPos.getZ() + 0.5 - CodecClient.mc.thePlayer.posZ;
         double yawToBlock = Math.atan2(-deltaX, deltaZ);
         double yaw = Math.toDegrees(yawToBlock);
+
         yaw = (yaw + 360) % 360;
+        if (yaw > 180) {
+            yaw -= 360;
+        }
 
         return (float) yaw;
     }
+
 
     public static float getPitch(BlockPos blockPos) {
         double deltaX = blockPos.getX() + 0.5 - CodecClient.mc.thePlayer.posX;
