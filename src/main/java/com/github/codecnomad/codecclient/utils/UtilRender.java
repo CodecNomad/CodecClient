@@ -16,8 +16,8 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
-public class RenderUtils {
-    private static final ResourceLocation IMAGE_TEXTURE = new ResourceLocation("skyblockfeatures", "path_arrow.png");
+@SuppressWarnings({"unused", "DuplicatedCode"})
+public class UtilRender {
 
     public static void drawOutlinedFilledBoundingBox(AxisAlignedBB aabb, Color color, float partialTicks) {
         aabb = aabb.offset(-0.001, -0.001, -0.001);
@@ -28,8 +28,8 @@ public class RenderUtils {
         GlStateManager.depthMask(false);
 
         double width = Math.max(1 - (CodecClient.mc.thePlayer.getDistance(aabb.minX, aabb.minY, aabb.minZ) / 10 - 2), 2);
-        RenderUtils.drawBoundingBox(aabb, color, partialTicks);
-        RenderUtils.drawOutlinedBoundingBox(aabb.offset(-0.001, -0.001, -0.001).expand(0.002, 0.002, 0.002), color, (float) width, partialTicks);
+        UtilRender.drawBoundingBox(aabb, color, partialTicks);
+        UtilRender.drawOutlinedBoundingBox(aabb.offset(-0.001, -0.001, -0.001).expand(0.002, 0.002, 0.002), color, (float) width, partialTicks);
         GlStateManager.depthMask(true);
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
@@ -42,7 +42,6 @@ public class RenderUtils {
     }
 
     public static void drawWaypoint(BlockPos pos, Color color, String label, float partialTicks, boolean throughWalls) {
-        // Beacon
         AxisAlignedBB aabb2 = new AxisAlignedBB(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, pos.getX() + 0.5, pos.getY() + 100, pos.getZ() + 0.5);
 
         GlStateManager.pushMatrix();
@@ -166,7 +165,6 @@ public class RenderUtils {
         worldrenderer.pos(j + 1, -1 + i, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
-        // fontrenderer.drawStringWithShadow(str, -fontrenderer.getStringWidth(str) / 2, i, 553648127);
         GlStateManager.enableDepth();
         GlStateManager.depthMask(true);
         fontrenderer.drawStringWithShadow(str, (float) -fontrenderer.getStringWidth(str) / 2, i, -1);
@@ -288,12 +286,6 @@ public class RenderUtils {
         GlStateManager.popMatrix();
     }
 
-    /**
-     * Taken from Danker's Skyblock Mod under GPL 3.0 license
-     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
-     *
-     * @author bowser0000
-     */
     public static void draw3DLine(Vec3 pos1, Vec3 pos2, int width, Color color, float partialTicks) {
         Entity render = Minecraft.getMinecraft().getRenderViewEntity();
         WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
@@ -324,72 +316,5 @@ public class RenderUtils {
         GlStateManager.enableTexture2D();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
-    }
-
-    public static void draw3DArrowLine(Vec3 pos1, Vec3 pos2, Color color) {
-        double distance = pos1.distanceTo(pos2);
-        if (distance > 1.5) {
-            Vec3 direction = new Vec3(pos2.xCoord - pos1.xCoord, pos2.yCoord - pos1.yCoord, pos2.zCoord - pos1.zCoord).normalize();
-            double arrowSpacing = 1.5; // Spacing between arrow markers
-            int numArrows = (int) (distance / arrowSpacing);
-
-            for (int i = 0; i < numArrows; i++) {
-                double arrowX = pos1.xCoord + direction.xCoord * (arrowSpacing * i);
-                double arrowY = pos1.yCoord + direction.yCoord * (arrowSpacing * i);
-                double arrowZ = pos1.zCoord + direction.zCoord * (arrowSpacing * i);
-                Vec3 arrowPos = new Vec3(arrowX, arrowY, arrowZ);
-                float yaw = (float) MathHelper.wrapAngleTo180_double(Math.atan2(direction.zCoord, direction.xCoord) * 180.0 / Math.PI);
-                float pitch = (float) MathHelper.wrapAngleTo180_double(Math.atan2(-direction.yCoord, Math.sqrt(direction.xCoord * direction.xCoord + direction.zCoord * direction.zCoord)) * 180.0 / Math.PI);
-
-                RenderUtils.drawImageInWorld(arrowPos, pitch, yaw, color);
-            }
-        }
-    }
-
-    public static void drawImageInWorld(Vec3 start, float pitch, float yaw, Color color) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double x = start.xCoord;
-        double y = start.yCoord;
-        double z = start.zCoord;
-        double scale = 2;
-
-        GlStateManager.pushAttrib(); // Save OpenGL state
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x - mc.getRenderManager().viewerPosX, y - mc.getRenderManager().viewerPosY, z - mc.getRenderManager().viewerPosZ);
-        GlStateManager.rotate(-yaw, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
-        GlStateManager.scale(scale, scale, scale);
-        mc.getTextureManager().bindTexture(IMAGE_TEXTURE);
-
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDisable(GL11.GL_CULL_FACE); // Disable face culling
-
-        float red = color.getRed() / 255.0f;
-        float green = color.getGreen() / 255.0f;
-        float blue = color.getBlue() / 255.0f;
-
-        GL11.glColor4f(red, green, blue, 0.8f);
-
-        GL11.glBegin(GL11.GL_QUADS);
-        GL11.glTexCoord2d(0, 1); // Invert the y-axis texture coordinate
-        GL11.glVertex3d(0, 0, 0);
-        GL11.glTexCoord2d(1, 1);
-        GL11.glVertex3d(1, 0, 0);
-        GL11.glTexCoord2d(1, 0);
-        GL11.glVertex3d(1, 1, 0);
-        GL11.glTexCoord2d(0, 0);
-        GL11.glVertex3d(0, 1, 0);
-        GL11.glEnd();
-
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_CULL_FACE); // Re-enable face culling
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glColor4f(1f, 1f, 1f, 1f);
-        GlStateManager.popMatrix();
-        GlStateManager.popAttrib();
     }
 }

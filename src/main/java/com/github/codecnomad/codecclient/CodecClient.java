@@ -1,9 +1,9 @@
 package com.github.codecnomad.codecclient;
 
-import com.github.codecnomad.codecclient.Guis.Config;
-import com.github.codecnomad.codecclient.classes.Module;
-import com.github.codecnomad.codecclient.classes.Rotation;
-import com.github.codecnomad.codecclient.modules.FishingMacro;
+import com.github.codecnomad.codecclient.Guis.GuiConfig;
+import com.github.codecnomad.codecclient.classes.HelperClassModule;
+import com.github.codecnomad.codecclient.classes.HelperClassRotation;
+import com.github.codecnomad.codecclient.modules.MacroFishing;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -16,26 +16,26 @@ import java.util.Map;
 
 @Mod(modid = "codecclient", useMetadata = true)
 public class CodecClient {
-    public static Map<String, Module> modules = new HashMap<>();
+    public static Map<String, HelperClassModule> modules = new HashMap<>();
     public static Minecraft mc = Minecraft.getMinecraft();
-    public static Rotation rotation = new Rotation();
-    public static Config config;
+    public static HelperClassRotation helperClassRotation = new HelperClassRotation();
+    public static GuiConfig guiConfig;
 
     static {
-        modules.put("FishingMacro", new FishingMacro());
+        modules.put("FishingMacro", new MacroFishing());
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        config = new Config();
+        guiConfig = new GuiConfig();
 
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(rotation);
+        MinecraftForge.EVENT_BUS.register(helperClassRotation);
     }
 
     @SubscribeEvent
     public void disconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
-        for (Map.Entry<String, Module> moduleMap : modules.entrySet()) {
+        for (Map.Entry<String, HelperClassModule> moduleMap : modules.entrySet()) {
             moduleMap.getValue().unregister();
         }
     }

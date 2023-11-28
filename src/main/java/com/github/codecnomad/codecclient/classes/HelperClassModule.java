@@ -2,11 +2,10 @@ package com.github.codecnomad.codecclient.classes;
 
 import net.minecraftforge.common.MinecraftForge;
 
-public class Module {
+public class HelperClassModule {
     public boolean state;
 
-    public Module() {
-//        this.register();
+    public HelperClassModule() {
     }
 
     public void register() {

@@ -3,7 +3,7 @@ package com.github.codecnomad.codecclient.utils;
 import com.github.codecnomad.codecclient.CodecClient;
 import net.minecraft.util.BlockPos;
 
-public class MathUtils {
+public class UtilMath {
 
     public static float easeInOut(float t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
@@ -29,11 +29,9 @@ public class MathUtils {
 
         if (m > 0) {
             return String.format("%dM", m);
-        }
-        else if (k > 0) {
+        } else if (k > 0) {
             return String.format("%dk", k);
-        }
-        else {
+        } else {
             return String.format("%d", remaining);
         }
     }
@@ -43,6 +41,7 @@ public class MathUtils {
         double deltaZ = blockPos.getZ() + 0.5 - CodecClient.mc.thePlayer.posZ;
         double yawToBlock = Math.atan2(-deltaX, deltaZ);
         double yaw = Math.toDegrees(yawToBlock);
+        yaw = (yaw + 360) % 360;
 
         return (float) yaw;
     }
@@ -54,9 +53,11 @@ public class MathUtils {
         double distanceXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
         double pitchToBlock = -Math.atan2(deltaY, distanceXZ);
         double pitch = Math.toDegrees(pitchToBlock);
+        pitch = Math.max(-90, Math.min(90, pitch));
 
         return (float) pitch;
     }
+
 
 
 }

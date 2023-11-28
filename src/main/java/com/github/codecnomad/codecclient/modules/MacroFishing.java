@@ -1,14 +1,14 @@
 package com.github.codecnomad.codecclient.modules;
 
 import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.Guis.Config;
-import com.github.codecnomad.codecclient.classes.Counter;
-import com.github.codecnomad.codecclient.classes.Module;
-import com.github.codecnomad.codecclient.classes.PacketEvent;
-import com.github.codecnomad.codecclient.mixins.S19Accessor;
-import com.github.codecnomad.codecclient.utils.ChatUtils;
-import com.github.codecnomad.codecclient.utils.MathUtils;
-import com.github.codecnomad.codecclient.utils.RenderUtils;
+import com.github.codecnomad.codecclient.Guis.GuiConfig;
+import com.github.codecnomad.codecclient.classes.HelperClassCounter;
+import com.github.codecnomad.codecclient.classes.HelperClassModule;
+import com.github.codecnomad.codecclient.classes.HelperClassPacketEvent;
+import com.github.codecnomad.codecclient.mixins.AccessorS19;
+import com.github.codecnomad.codecclient.utils.UtilChat;
+import com.github.codecnomad.codecclient.utils.UtilMath;
+import com.github.codecnomad.codecclient.utils.UtilRender;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockStaticLiquid;
@@ -34,14 +34,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-public class FishingMacro extends Module {
+public class MacroFishing extends HelperClassModule {
+    public static final String[] FAILSAFE_TEXT = new String[]{"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "j g growl wtf", "can i get friend request??", "hello i'm here",};
     public static int startTime = 0;
     public static int catches = 0;
     public static float xpGain = 0;
-    public static final String[] FAILSAFE_TEXT = new String[]{"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "j g gdrw hwtf", "can i get friend request??", "henlo i'm here",};
     public FishingSteps currentStep = FishingSteps.FIND_ROD;
-    public Counter MainCounter = new Counter();
-    public Counter FailsafeCounter = new Counter();
+    public HelperClassCounter MainCounter = new HelperClassCounter();
+    public HelperClassCounter FailsafeCounter = new HelperClassCounter();
     public boolean failSafe = false;
     Entity fishingHook = null;
     Entity fishingMarker = null;
@@ -62,8 +62,8 @@ public class FishingMacro extends Module {
         MinecraftForge.EVENT_BUS.unregister(this);
         this.state = false;
 
-        CodecClient.rotation.updatePitch = false;
-        CodecClient.rotation.updateYaw = false;
+        CodecClient.helperClassRotation.updatePitch = false;
+        CodecClient.helperClassRotation.updateYaw = false;
 
         startTime = 0;
         catches = 0;
@@ -126,7 +126,7 @@ public class FishingMacro extends Module {
                     }
                 }
 
-                ChatUtils.sendMessage("Disabled macro -> couldn't find rod.");
+                UtilChat.sendMessage("Disabled macro -> couldn't find rod.");
                 this.unregister();
 
                 return;
@@ -134,22 +134,22 @@ public class FishingMacro extends Module {
 
             case LOOK_TO_NEW_BLOCK: {
                 if (waterBlocks.isEmpty()) {
-                    ChatUtils.sendMessage("Disabled macro -> couldn't find any water.");
+                    UtilChat.sendMessage("Disabled macro -> couldn't find any water.");
                     this.unregister();
                     return;
                 }
 
                 BlockPos randomWater = waterBlocks.get((int) (Math.random() * waterBlocks.size()));
                 currentWaterBlock = randomWater;
-                CodecClient.rotation.setYaw((float) (MathUtils.getYaw(randomWater) - 2 + Math.random() * 3), 4);
-                CodecClient.rotation.setPitch((float) (MathUtils.getPitch(randomWater) - 2 + Math.random() * 3), 4);
+                CodecClient.helperClassRotation.setYaw((float) (UtilMath.getYaw(randomWater) - 2 + Math.random() * 3), 4);
+                CodecClient.helperClassRotation.setPitch((float) (UtilMath.getPitch(randomWater) - 2 + Math.random() * 3), 4);
 
                 currentStep = FishingSteps.CAST_HOOK;
                 return;
             }
 
             case CAST_HOOK: {
-                if (CodecClient.rotation.updateYaw || CodecClient.rotation.updatePitch) {
+                if (CodecClient.helperClassRotation.updateYaw || CodecClient.helperClassRotation.updatePitch) {
                     return;
                 }
 
@@ -160,7 +160,7 @@ public class FishingMacro extends Module {
             }
 
             case WAIT_FOR_CATCH: {
-                if (MainCounter.countUntil(Config.FishingDelay)) {
+                if (MainCounter.countUntil(GuiConfig.FishingDelay)) {
                     return;
                 }
 
@@ -192,7 +192,7 @@ public class FishingMacro extends Module {
             }
 
             case KILL_DELAY: {
-                if (MainCounter.countUntil(Config.KillDelay)) {
+                if (MainCounter.countUntil(GuiConfig.KillDelay)) {
                     return;
                 }
 
@@ -220,10 +220,10 @@ public class FishingMacro extends Module {
                     }
                 }
 
-                CodecClient.rotation.setYaw((float) (MathUtils.getYaw(fishingMonster.getPosition()) - 1 + Math.random() * 2), 4);
-                CodecClient.rotation.setPitch((float) (MathUtils.getPitch(fishingMonster.getPosition().add(0, fishingMonster.getEyeHeight(), 0)) - 1 + Math.random() * 2), 4);
+                CodecClient.helperClassRotation.setYaw((float) (UtilMath.getYaw(fishingMonster.getPosition()) - 1 + Math.random() * 2), 4);
+                CodecClient.helperClassRotation.setPitch((float) (UtilMath.getPitch(fishingMonster.getPosition().add(0, fishingMonster.getEyeHeight(), 0)) - 1 + Math.random() * 2), 4);
 
-                if (!MainCounter.countUntil(20 / Config.AttackCps)) {
+                if (!MainCounter.countUntil(20 / GuiConfig.AttackCps)) {
                     MainCounter.add(Math.random() * 100 > 70 ? 1 : 0);
                     KeyBinding.onTick(CodecClient.mc.gameSettings.keyBindAttack.getKeyCode());
                 }
@@ -235,9 +235,9 @@ public class FishingMacro extends Module {
     public void renderLast(RenderWorldLastEvent event) {
         if (currentWaterBlock != null) {
             GlStateManager.disableDepth();
-            RenderUtils.drawOutlinedFilledBoundingBox(
+            UtilRender.drawOutlinedFilledBoundingBox(
                     currentWaterBlock,
-                    Config.VisualColor.toJavaColor(),
+                    GuiConfig.VisualColor.toJavaColor(),
                     event.partialTicks);
             GlStateManager.enableDepth();
         }
@@ -269,19 +269,19 @@ public class FishingMacro extends Module {
             return;
         }
 
-        Matcher matcher = ChatUtils.FishingSkillPattern.matcher(event.message.getFormattedText());
-        if (matcher.find()){
+        Matcher matcher = UtilChat.FishingSkillPattern.matcher(event.message.getFormattedText());
+        if (matcher.find()) {
             xpGain += Float.parseFloat(matcher.group(1));
         }
     }
 
     @SubscribeEvent
-    public void packetReceive(PacketEvent.ReceiveEvent event) {
+    public void packetReceive(HelperClassPacketEvent.ReceiveEventHelperClass event) {
         if (
                 event.packet instanceof S08PacketPlayerPosLook ||
                         event.packet instanceof S09PacketHeldItemChange ||
                         (
-                                event.packet instanceof S19PacketEntityHeadLook && ((S19Accessor) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
+                                event.packet instanceof S19PacketEntityHeadLook && ((AccessorS19) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
                         ) ||
                         (
                                 event.packet instanceof S1BPacketEntityAttach && ((S1BPacketEntityAttach) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
@@ -290,8 +290,8 @@ public class FishingMacro extends Module {
                                 event.packet instanceof S18PacketEntityTeleport && ((S18PacketEntityTeleport) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
                         )
         ) {
-            ChatUtils.sendMessage("Disabled macro -> failsafe has been triggered");
-            CodecClient.rotation.reset();
+            UtilChat.sendMessage("Disabled macro -> failsafe has been triggered");
+            CodecClient.helperClassRotation.reset();
             failSafe = true;
         }
     }
@@ -308,8 +308,8 @@ public class FishingMacro extends Module {
 
             switch (FailsafeCounter.get()) {
                 case 20: {
-                    CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), 4);
-                    CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), 4);
+                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), 4);
+                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), 4);
 
                     KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindBack.getKeyCode(), true);
                     KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindRight.getKeyCode(), true);
@@ -325,14 +325,14 @@ public class FishingMacro extends Module {
                 case 60: {
                     CodecClient.mc.thePlayer.sendChatMessage(FAILSAFE_TEXT[(int) (Math.random() * FAILSAFE_TEXT.length)]);
 
-                    CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), 4);
-                    CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), 4);
+                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), 4);
+                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), 4);
                     break;
                 }
 
                 case 80: {
-                    CodecClient.rotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), 4);
-                    CodecClient.rotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), 4);
+                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), 4);
+                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), 4);
                     break;
                 }
 
