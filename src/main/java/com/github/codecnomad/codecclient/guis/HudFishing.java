@@ -20,8 +20,8 @@ public class HudFishing extends BasicHud {
 
         NanoVGHelper.INSTANCE.setupAndDraw(true, vg -> {
             int elapsedTimeSeconds = (int) (System.currentTimeMillis() / 1000 - startTime);
-            int averageCPH = catches != 0 ? (catches * 1800) / (elapsedTimeSeconds != 0 ? elapsedTimeSeconds : 1) : 0;
-            int averageXPH = xpGain != 0 ? (int) ((xpGain * 1800) / (elapsedTimeSeconds != 0 ? elapsedTimeSeconds : 1)) : 0;
+            int averageCPH = catches != 0 ? (catches * 3600) / (elapsedTimeSeconds != 0 ? elapsedTimeSeconds : 1) : 0;
+            int averageXPH = xpGain != 0 ? (int) ((xpGain * 3600) / (elapsedTimeSeconds != 0 ? elapsedTimeSeconds : 1)) : 0;
 
             NanoVGHelper.INSTANCE.drawLine(vg,
                     x - 5 * scale,

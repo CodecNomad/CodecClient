@@ -1,10 +1,10 @@
 package com.github.codecnomad.codecclient.modules;
 
 import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.guis.GuiConfig;
 import com.github.codecnomad.codecclient.classes.HelperClassCounter;
 import com.github.codecnomad.codecclient.classes.HelperClassModule;
 import com.github.codecnomad.codecclient.classes.HelperClassPacketEvent;
+import com.github.codecnomad.codecclient.guis.GuiConfig;
 import com.github.codecnomad.codecclient.mixins.AccessorS19;
 import com.github.codecnomad.codecclient.utils.UtilChat;
 import com.github.codecnomad.codecclient.utils.UtilMath;
@@ -245,19 +245,17 @@ public class MacroFishing extends HelperClassModule {
 
     @SubscribeEvent
     public void entitySpawn(EntityJoinWorldEvent event) {
-        if (fishingHook == null || event.entity instanceof EntitySquid) {
+        if (fishingHook == null || event.entity instanceof EntitySquid || event.entity.getName().equals("item.tile.stone.stone")) {
             return;
         }
 
-        if (event.entity instanceof EntityArmorStand && event.entity.getDistanceToEntity(fishingHook) <= 8) {
+        if (event.entity instanceof EntityArmorStand && event.entity.getDistanceToEntity(fishingHook) <= 0.1) {
             fishingMarker = event.entity;
             return;
         }
 
         if (fishingMonster == null &&
-                event.entity.getDistanceToEntity(fishingHook) <= 1.25 &&
-                event.entity.getDistanceToEntity(fishingHook) >= 0.75 &&
-                !event.entity.getName().equals("item.tile.stone.stone")
+                event.entity.getDistanceToEntity(fishingHook) <= 1.5
         ) {
             fishingMonster = event.entity;
         }
