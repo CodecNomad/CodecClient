@@ -1,9 +1,7 @@
 package com.github.codecnomad.codecclient.guis;
 
-import cc.polyfrost.oneconfig.config.annotations.Color;
-import cc.polyfrost.oneconfig.config.annotations.HUD;
-import cc.polyfrost.oneconfig.config.annotations.KeyBind;
 import cc.polyfrost.oneconfig.config.annotations.Number;
+import cc.polyfrost.oneconfig.config.annotations.*;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.Mod;
@@ -30,7 +28,7 @@ public class GuiConfig extends cc.polyfrost.oneconfig.config.Config {
             category = "Macros",
             subcategory = "Fishing",
             min = 1,
-            max = 10
+            max = 20
     )
     public static int FishingDelay = 10;
     @Number(
@@ -49,6 +47,23 @@ public class GuiConfig extends cc.polyfrost.oneconfig.config.Config {
             max = 20
     )
     public static int AttackCps = 10;
+
+    @Number(
+            name = "Smoothing",
+            category = "Macros",
+            subcategory = "Fishing",
+            min = 2,
+            max = 10
+    )
+    public static int RotationSmoothing = 4;
+
+    @Switch(
+            name = "Auto kill",
+            category = "Macros",
+            subcategory = "Fishing"
+    )
+    public static boolean AutoKill = true;
+
     @HUD(
             name = "Fishing HUD",
             category = "Visuals"

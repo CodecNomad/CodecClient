@@ -141,8 +141,8 @@ public class MacroFishing extends HelperClassModule {
 
                 BlockPos randomWater = waterBlocks.get((int) (Math.random() * waterBlocks.size()));
                 currentWaterBlock = randomWater;
-                CodecClient.helperClassRotation.setYaw((float) (UtilMath.getYaw(randomWater) - 2 + Math.random() * 3), 4);
-                CodecClient.helperClassRotation.setPitch((float) (UtilMath.getPitch(randomWater) - 2 + Math.random() * 3), 4);
+                CodecClient.helperClassRotation.setYaw((float) (UtilMath.getYaw(randomWater) - 2 + Math.random() * 3), GuiConfig.RotationSmoothing);
+                CodecClient.helperClassRotation.setPitch((float) (UtilMath.getPitch(randomWater) - 2 + Math.random() * 3), GuiConfig.RotationSmoothing);
 
                 currentStep = FishingSteps.CAST_HOOK;
                 return;
@@ -187,7 +187,11 @@ public class MacroFishing extends HelperClassModule {
             case CATCH: {
                 CodecClient.mc.playerController.sendUseItem(CodecClient.mc.thePlayer, CodecClient.mc.thePlayer.getEntityWorld(), CodecClient.mc.thePlayer.inventory.getCurrentItem());
 
-                currentStep = FishingSteps.KILL_DELAY;
+                if (GuiConfig.AutoKill) {
+                    currentStep = FishingSteps.KILL_DELAY;
+                } else {
+                    currentStep = FishingSteps.FIND_ROD;
+                }
                 catches++;
             }
 
@@ -220,8 +224,8 @@ public class MacroFishing extends HelperClassModule {
                     }
                 }
 
-                CodecClient.helperClassRotation.setYaw((float) (UtilMath.getYaw(fishingMonster.getPosition()) - 1 + Math.random() * 2), 4);
-                CodecClient.helperClassRotation.setPitch((float) (UtilMath.getPitch(fishingMonster.getPosition().add(0, fishingMonster.getEyeHeight(), 0)) - 1 + Math.random() * 2), 4);
+                CodecClient.helperClassRotation.setYaw((float) (UtilMath.getYaw(fishingMonster.getPosition()) - 1 + Math.random() * 2), GuiConfig.RotationSmoothing);
+                CodecClient.helperClassRotation.setPitch((float) (UtilMath.getPitch(fishingMonster.getPosition().add(0, fishingMonster.getEyeHeight(), 0)) - 1 + Math.random() * 2), GuiConfig.RotationSmoothing);
 
                 if (!MainCounter.countUntil(20 / GuiConfig.AttackCps)) {
                     MainCounter.add(Math.random() * 100 > 70 ? 1 : 0);
@@ -306,8 +310,8 @@ public class MacroFishing extends HelperClassModule {
 
             switch (FailsafeCounter.get()) {
                 case 20: {
-                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), 4);
-                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), 4);
+                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), GuiConfig.RotationSmoothing);
+                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), GuiConfig.RotationSmoothing);
 
                     KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindBack.getKeyCode(), true);
                     KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindRight.getKeyCode(), true);
@@ -323,14 +327,14 @@ public class MacroFishing extends HelperClassModule {
                 case 60: {
                     CodecClient.mc.thePlayer.sendChatMessage(FAILSAFE_TEXT[(int) (Math.random() * FAILSAFE_TEXT.length)]);
 
-                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), 4);
-                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), 4);
+                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), GuiConfig.RotationSmoothing);
+                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), GuiConfig.RotationSmoothing);
                     break;
                 }
 
                 case 80: {
-                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), 4);
-                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), 4);
+                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), GuiConfig.RotationSmoothing);
+                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), GuiConfig.RotationSmoothing);
                     break;
                 }
 

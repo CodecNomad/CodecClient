@@ -124,7 +124,7 @@ public class HudFishing extends BasicHud {
             NanoVGHelper.INSTANCE.drawLine(vg,
                     x - (5 * scale),
                     y + (37 * scale),
-                    x + this.getWidth(this.getScale(),  false) + (5 * scale),
+                    x + this.getWidth(this.getScale(), false) + (5 * scale),
                     y + (37 * scale), (1 * scale),
                     GuiConfig.VisualColor.getRGB());
         });
