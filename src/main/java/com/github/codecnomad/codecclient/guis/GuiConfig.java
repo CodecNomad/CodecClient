@@ -78,7 +78,7 @@ public class GuiConfig extends cc.polyfrost.oneconfig.config.Config {
     public HudFishing hudFishing = new HudFishing();
 
     public GuiConfig() {
-        super(new Mod("codecclient", ModType.UTIL_QOL), "config.json");
+        super(new Mod("codecclient", ModType.UTIL_QOL, "https://cdn.discordapp.com/avatars/1163205190267175075/7d1152c4d56b3afa5cc2cd8d21258850?size=1024"), "config.json");
         this.registerKeyBind(FishingKeybinding, () -> toggle("FishingMacro"));
         initialize();
     }
