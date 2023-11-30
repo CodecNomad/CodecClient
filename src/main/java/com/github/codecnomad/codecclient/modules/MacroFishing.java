@@ -22,6 +22,7 @@ import net.minecraft.entity.passive.EntitySquid;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.item.*;
 import net.minecraft.network.play.server.*;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -228,8 +229,14 @@ public class MacroFishing extends HelperClassModule {
                     }
                 }
 
-                CodecClient.helperClassRotation.setYaw((float) (UtilMath.getYaw(fishingMonster.getPosition()) - 1 + Math.random() * 2), GuiConfig.RotationSmoothing);
-                CodecClient.helperClassRotation.setPitch((float) (UtilMath.getPitch(fishingMonster.getPosition().add(0, fishingMonster.getEyeHeight(), 0)) - 1 + Math.random() * 2), GuiConfig.RotationSmoothing);
+                AxisAlignedBB boundingBox = fishingMonster.getEntityBoundingBox();
+                double deltaX = boundingBox.maxX - boundingBox.minX;
+                double deltaY = boundingBox.maxY - boundingBox.minY;
+                double deltaZ = boundingBox.maxZ - boundingBox.minZ;
+
+                BlockPos randomPositionOnBoundingBox = new BlockPos(boundingBox.minX + deltaX, boundingBox.minY + deltaY, boundingBox.minZ + deltaZ);
+                CodecClient.helperClassRotation.setYaw(UtilMath.getYaw(randomPositionOnBoundingBox), GuiConfig.RotationSmoothing);
+                CodecClient.helperClassRotation.setPitch(UtilMath.getPitch(randomPositionOnBoundingBox), GuiConfig.RotationSmoothing);
 
                 if (!MainCounter.countUntil(20 / GuiConfig.AttackCps)) {
                     MainCounter.add(Math.random() * 100 > 70 ? 1 : 0);
