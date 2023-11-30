@@ -4,6 +4,7 @@ import com.github.codecnomad.codecclient.CodecClient;
 import com.github.codecnomad.codecclient.classes.HelperClassCounter;
 import com.github.codecnomad.codecclient.classes.HelperClassModule;
 import com.github.codecnomad.codecclient.classes.HelperClassPacketEvent;
+import com.github.codecnomad.codecclient.classes.HelperClassSound;
 import com.github.codecnomad.codecclient.guis.GuiConfig;
 import com.github.codecnomad.codecclient.mixins.AccessorS19;
 import com.github.codecnomad.codecclient.utils.UtilChat;
@@ -54,6 +55,8 @@ public class MacroFishing extends HelperClassModule {
         MinecraftForge.EVENT_BUS.register(this);
         this.state = true;
 
+        HelperClassSound.disableSounds();
+
         startTime = (int) Math.floor((double) System.currentTimeMillis() / 1000);
     }
 
@@ -64,6 +67,8 @@ public class MacroFishing extends HelperClassModule {
 
         CodecClient.helperClassRotation.updatePitch = false;
         CodecClient.helperClassRotation.updateYaw = false;
+
+        HelperClassSound.enableSounds();
 
         startTime = 0;
         catches = 0;
@@ -78,7 +83,6 @@ public class MacroFishing extends HelperClassModule {
         fishingMonster = null;
         waterBlocks.clear();
         currentWaterBlock = null;
-
     }
 
     @SubscribeEvent
@@ -306,7 +310,12 @@ public class MacroFishing extends HelperClassModule {
 
         if (FailsafeCounter.countUntil(120)) {
 
+            HelperClassSound.enableSounds();
             CodecClient.mc.thePlayer.playSound("random.anvil_land", 10.f, 1.f);
+
+            if (GuiConfig.OnlySound) {
+                return;
+            }
 
             switch (FailsafeCounter.get()) {
                 case 20: {

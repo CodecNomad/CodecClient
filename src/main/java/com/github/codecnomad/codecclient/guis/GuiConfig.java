@@ -64,6 +64,13 @@ public class GuiConfig extends cc.polyfrost.oneconfig.config.Config {
     )
     public static boolean AutoKill = true;
 
+    @Switch(
+            name = "Only sound failsafe",
+            category = "Macros",
+            subcategory = "Fishing"
+    )
+    public static boolean OnlySound = false;
+
     @HUD(
             name = "Fishing HUD",
             category = "Visuals"
