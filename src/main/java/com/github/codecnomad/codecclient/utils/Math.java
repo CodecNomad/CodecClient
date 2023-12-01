@@ -10,6 +10,13 @@ public class Math {
     }
 
     public static float interpolate(float goal, float current, float time) {
+        while (goal - current > 180) {
+            current += 360;
+        }
+        while (goal - current < -180) {
+            current -= 360;
+        }
+
         float t = easeInOut(time);
         return current + (goal - current) * t;
     }
