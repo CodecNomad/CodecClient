@@ -155,7 +155,7 @@ public class FishingMacro extends Module {
                     return;
                 }
 
-                Client.mc.playerController.sendUseItem(Client.mc.thePlayer, Client.mc.thePlayer.getEntityWorld(), Client.mc.thePlayer.inventory.getCurrentItem());
+                KeyBinding.onTick(Client.mc.gameSettings.keyBindUseItem.getKeyCode());
 
                 currentStep = FishingSteps.WAIT_FOR_CATCH;
                 return;
@@ -187,7 +187,7 @@ public class FishingMacro extends Module {
             }
 
             case CATCH: {
-                Client.mc.playerController.sendUseItem(Client.mc.thePlayer, Client.mc.thePlayer.getEntityWorld(), Client.mc.thePlayer.inventory.getCurrentItem());
+                KeyBinding.onTick(Client.mc.gameSettings.keyBindUseItem.getKeyCode());
 
                 if (Config.AutoKill) {
                     currentStep = FishingSteps.KILL_DELAY;
@@ -217,8 +217,8 @@ public class FishingMacro extends Module {
                     if (stack != null &&
                             (
                                     stack.getItem() instanceof ItemSpade ||
-                                            stack.getItem() instanceof ItemSword ||
-                                            stack.getItem() instanceof ItemAxe
+                                    stack.getItem() instanceof ItemSword ||
+                                    stack.getItem() instanceof ItemAxe
                             )
                     ) {
                         Client.mc.thePlayer.inventory.currentItem = slotIndex;

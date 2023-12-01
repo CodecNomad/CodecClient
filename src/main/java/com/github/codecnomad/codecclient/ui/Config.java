@@ -78,7 +78,7 @@ public class Config extends cc.polyfrost.oneconfig.config.Config {
     public FishingHud hudFishing = new FishingHud();
 
     public Config() {
-        super(new Mod("CodecClient", ModType.UTIL_QOL, "https://cdn.discordapp.com/avatars/1163205190267175075/7d1152c4d56b3afa5cc2cd8d21258850?size=1024"), "config.json");
+        super(new Mod("CodecClient", ModType.UTIL_QOL), "config.json");
         this.registerKeyBind(FishingKeybinding, () -> toggle("FishingMacro"));
         initialize();
     }
