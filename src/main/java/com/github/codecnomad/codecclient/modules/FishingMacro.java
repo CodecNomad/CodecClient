@@ -1,15 +1,11 @@
 package com.github.codecnomad.codecclient.modules;
 
-import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.classes.HelperClassCounter;
-import com.github.codecnomad.codecclient.classes.HelperClassModule;
-import com.github.codecnomad.codecclient.classes.HelperClassPacketEvent;
-import com.github.codecnomad.codecclient.classes.HelperClassSound;
-import com.github.codecnomad.codecclient.guis.GuiConfig;
-import com.github.codecnomad.codecclient.mixins.AccessorS19;
-import com.github.codecnomad.codecclient.utils.UtilChat;
-import com.github.codecnomad.codecclient.utils.UtilMath;
-import com.github.codecnomad.codecclient.utils.UtilRender;
+import com.github.codecnomad.codecclient.Client;
+import com.github.codecnomad.codecclient.utils.*;
+import com.github.codecnomad.codecclient.events.PacketEvent;
+import com.github.codecnomad.codecclient.ui.Config;
+import com.github.codecnomad.codecclient.mixins.S19PacketAccessor;
+import com.github.codecnomad.codecclient.utils.Math;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockStaticLiquid;
@@ -36,14 +32,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-public class MacroFishing extends HelperClassModule {
+@SuppressWarnings("DuplicatedCode")
+public class FishingMacro extends Module {
     public static final String[] FAILSAFE_TEXT = new String[]{"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "j g growl wtf", "can i get friend request??", "hello i'm here",};
     public static int startTime = 0;
     public static int catches = 0;
     public static float xpGain = 0;
     public FishingSteps currentStep = FishingSteps.FIND_ROD;
-    public HelperClassCounter MainCounter = new HelperClassCounter();
-    public HelperClassCounter FailsafeCounter = new HelperClassCounter();
+    public Counter MainCounter = new Counter();
+    public Counter FailsafeCounter = new Counter();
     public boolean failSafe = false;
     Entity fishingHook = null;
     Entity fishingMarker = null;
@@ -56,9 +53,9 @@ public class MacroFishing extends HelperClassModule {
         MinecraftForge.EVENT_BUS.register(this);
         this.state = true;
 
-        HelperClassSound.disableSounds();
+        Sound.disableSounds();
 
-        startTime = (int) Math.floor((double) System.currentTimeMillis() / 1000);
+        startTime = (int) java.lang.Math.floor((double) System.currentTimeMillis() / 1000);
     }
 
     @Override
@@ -66,10 +63,10 @@ public class MacroFishing extends HelperClassModule {
         MinecraftForge.EVENT_BUS.unregister(this);
         this.state = false;
 
-        CodecClient.helperClassRotation.updatePitch = false;
-        CodecClient.helperClassRotation.updateYaw = false;
+        Client.helperClassRotation.updatePitch = false;
+        Client.helperClassRotation.updateYaw = false;
 
-        HelperClassSound.enableSounds();
+        Sound.enableSounds();
 
         startTime = 0;
         catches = 0;
@@ -98,16 +95,16 @@ public class MacroFishing extends HelperClassModule {
                     for (int y = -1; y <= 1; y++) {
                         for (int z = -8; z <= 8; z++) {
                             BlockPos pos = new BlockPos(
-                                    CodecClient.mc.thePlayer.posX + x,
-                                    CodecClient.mc.thePlayer.posY + y,
-                                    CodecClient.mc.thePlayer.posZ + z
+                                    Client.mc.thePlayer.posX + x,
+                                    Client.mc.thePlayer.posY + y,
+                                    Client.mc.thePlayer.posZ + z
                             );
 
-                            Block block = CodecClient.mc.theWorld.getBlockState(pos).getBlock();
+                            Block block = Client.mc.theWorld.getBlockState(pos).getBlock();
 
                             if ((block instanceof BlockStaticLiquid || block instanceof BlockDynamicLiquid)
-                                    && CodecClient.mc.theWorld.rayTraceBlocks(
-                                    new Vec3(CodecClient.mc.thePlayer.posX, CodecClient.mc.thePlayer.posY + CodecClient.mc.thePlayer.getEyeHeight() / 2, CodecClient.mc.thePlayer.posZ),
+                                    && Client.mc.theWorld.rayTraceBlocks(
+                                    new Vec3(Client.mc.thePlayer.posX, Client.mc.thePlayer.posY + Client.mc.thePlayer.getEyeHeight() / 2, Client.mc.thePlayer.posZ),
                                     new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5),
                                     false, true, false
                             ) == null) {
@@ -122,16 +119,16 @@ public class MacroFishing extends HelperClassModule {
             }
 
             case FIND_ROD: {
-                for (int slotIndex = 0; slotIndex < CodecClient.mc.thePlayer.inventory.getSizeInventory(); slotIndex++) {
-                    ItemStack stack = CodecClient.mc.thePlayer.inventory.getStackInSlot(slotIndex);
+                for (int slotIndex = 0; slotIndex < Client.mc.thePlayer.inventory.getSizeInventory(); slotIndex++) {
+                    ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
                     if (stack != null && stack.getItem() instanceof ItemFishingRod) {
-                        CodecClient.mc.thePlayer.inventory.currentItem = slotIndex;
+                        Client.mc.thePlayer.inventory.currentItem = slotIndex;
                         currentStep = FishingSteps.LOOK_TO_NEW_BLOCK;
                         return;
                     }
                 }
 
-                UtilChat.sendMessage("Disabled macro -> couldn't find rod.");
+                Chat.sendMessage("Disabled macro -> couldn't find rod.");
                 this.unregister();
 
                 return;
@@ -139,38 +136,38 @@ public class MacroFishing extends HelperClassModule {
 
             case LOOK_TO_NEW_BLOCK: {
                 if (waterBlocks.isEmpty()) {
-                    UtilChat.sendMessage("Disabled macro -> couldn't find any water.");
+                    Chat.sendMessage("Disabled macro -> couldn't find any water.");
                     this.unregister();
                     return;
                 }
 
-                BlockPos randomWater = waterBlocks.get((int) (Math.random() * waterBlocks.size()));
+                BlockPos randomWater = waterBlocks.get((int) (java.lang.Math.random() * waterBlocks.size()));
                 currentWaterBlock = randomWater;
-                CodecClient.helperClassRotation.setYaw((float) (UtilMath.getYaw(randomWater) - 2 + Math.random() * 3), GuiConfig.RotationSmoothing);
-                CodecClient.helperClassRotation.setPitch((float) (UtilMath.getPitch(randomWater) - 2 + Math.random() * 3), GuiConfig.RotationSmoothing);
+                Client.helperClassRotation.setYaw((float) (Math.getYaw(randomWater) - 2 + java.lang.Math.random() * 3), Config.RotationSmoothing);
+                Client.helperClassRotation.setPitch((float) (Math.getPitch(randomWater) - 2 + java.lang.Math.random() * 3), Config.RotationSmoothing);
 
                 currentStep = FishingSteps.CAST_HOOK;
                 return;
             }
 
             case CAST_HOOK: {
-                if (CodecClient.helperClassRotation.updateYaw || CodecClient.helperClassRotation.updatePitch) {
+                if (Client.helperClassRotation.updateYaw || Client.helperClassRotation.updatePitch) {
                     return;
                 }
 
-                CodecClient.mc.playerController.sendUseItem(CodecClient.mc.thePlayer, CodecClient.mc.thePlayer.getEntityWorld(), CodecClient.mc.thePlayer.inventory.getCurrentItem());
+                Client.mc.playerController.sendUseItem(Client.mc.thePlayer, Client.mc.thePlayer.getEntityWorld(), Client.mc.thePlayer.inventory.getCurrentItem());
 
                 currentStep = FishingSteps.WAIT_FOR_CATCH;
                 return;
             }
 
             case WAIT_FOR_CATCH: {
-                if (MainCounter.countUntil(GuiConfig.FishingDelay)) {
+                if (MainCounter.countUntil(Config.FishingDelay)) {
                     return;
                 }
 
-                for (Entity entity : CodecClient.mc.theWorld.loadedEntityList) {
-                    if (entity instanceof EntityFishHook && ((EntityFishHook) entity).angler == CodecClient.mc.thePlayer) {
+                for (Entity entity : Client.mc.theWorld.loadedEntityList) {
+                    if (entity instanceof EntityFishHook && ((EntityFishHook) entity).angler == Client.mc.thePlayer) {
                         fishingHook = entity;
                     }
                 }
@@ -190,9 +187,9 @@ public class MacroFishing extends HelperClassModule {
             }
 
             case CATCH: {
-                CodecClient.mc.playerController.sendUseItem(CodecClient.mc.thePlayer, CodecClient.mc.thePlayer.getEntityWorld(), CodecClient.mc.thePlayer.inventory.getCurrentItem());
+                Client.mc.playerController.sendUseItem(Client.mc.thePlayer, Client.mc.thePlayer.getEntityWorld(), Client.mc.thePlayer.inventory.getCurrentItem());
 
-                if (GuiConfig.AutoKill) {
+                if (Config.AutoKill) {
                     currentStep = FishingSteps.KILL_DELAY;
                 } else {
                     currentStep = FishingSteps.FIND_ROD;
@@ -201,7 +198,7 @@ public class MacroFishing extends HelperClassModule {
             }
 
             case KILL_DELAY: {
-                if (MainCounter.countUntil(GuiConfig.KillDelay)) {
+                if (MainCounter.countUntil(Config.KillDelay)) {
                     return;
                 }
 
@@ -209,14 +206,14 @@ public class MacroFishing extends HelperClassModule {
             }
 
             case KILL_MONSTER: {
-                if (fishingMonster == null || !fishingMonster.isEntityAlive() || !CodecClient.mc.thePlayer.canEntityBeSeen(fishingMonster)) {
+                if (fishingMonster == null || !fishingMonster.isEntityAlive() || !Client.mc.thePlayer.canEntityBeSeen(fishingMonster)) {
                     currentStep = FishingSteps.FIND_ROD;
                     fishingMonster = null;
                     return;
                 }
 
-                for (int slotIndex = 0; slotIndex < CodecClient.mc.thePlayer.inventory.getSizeInventory(); slotIndex++) {
-                    ItemStack stack = CodecClient.mc.thePlayer.inventory.getStackInSlot(slotIndex);
+                for (int slotIndex = 0; slotIndex < Client.mc.thePlayer.inventory.getSizeInventory(); slotIndex++) {
+                    ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
                     if (stack != null &&
                             (
                                     stack.getItem() instanceof ItemSpade ||
@@ -224,7 +221,7 @@ public class MacroFishing extends HelperClassModule {
                                             stack.getItem() instanceof ItemAxe
                             )
                     ) {
-                        CodecClient.mc.thePlayer.inventory.currentItem = slotIndex;
+                        Client.mc.thePlayer.inventory.currentItem = slotIndex;
                         break;
                     }
                 }
@@ -235,12 +232,12 @@ public class MacroFishing extends HelperClassModule {
                 double deltaZ = boundingBox.maxZ - boundingBox.minZ;
 
                 BlockPos randomPositionOnBoundingBox = new BlockPos(boundingBox.minX + deltaX, boundingBox.minY + deltaY, boundingBox.minZ + deltaZ);
-                CodecClient.helperClassRotation.setYaw(UtilMath.getYaw(randomPositionOnBoundingBox), GuiConfig.RotationSmoothing);
-                CodecClient.helperClassRotation.setPitch(UtilMath.getPitch(randomPositionOnBoundingBox), GuiConfig.RotationSmoothing);
+                Client.helperClassRotation.setYaw(Math.getYaw(randomPositionOnBoundingBox), Config.RotationSmoothing);
+                Client.helperClassRotation.setPitch(Math.getPitch(randomPositionOnBoundingBox), Config.RotationSmoothing);
 
-                if (!MainCounter.countUntil(20 / GuiConfig.AttackCps)) {
-                    MainCounter.add(Math.random() * 100 > 70 ? 1 : 0);
-                    KeyBinding.onTick(CodecClient.mc.gameSettings.keyBindAttack.getKeyCode());
+                if (!MainCounter.countUntil(20 / Config.AttackCps)) {
+                    MainCounter.add(java.lang.Math.random() * 100 > 70 ? 1 : 0);
+                    KeyBinding.onTick(Client.mc.gameSettings.keyBindAttack.getKeyCode());
                 }
             }
         }
@@ -250,9 +247,9 @@ public class MacroFishing extends HelperClassModule {
     public void renderLast(RenderWorldLastEvent event) {
         if (currentWaterBlock != null) {
             GlStateManager.disableDepth();
-            UtilRender.drawOutlinedFilledBoundingBox(
+            Render.drawOutlinedFilledBoundingBox(
                     currentWaterBlock,
-                    GuiConfig.VisualColor.toJavaColor(),
+                    Config.VisualColor.toJavaColor(),
                     event.partialTicks);
             GlStateManager.enableDepth();
         }
@@ -282,29 +279,29 @@ public class MacroFishing extends HelperClassModule {
             return;
         }
 
-        Matcher matcher = UtilChat.FishingSkillPattern.matcher(event.message.getFormattedText());
+        Matcher matcher = Regex.FishingSkillPattern.matcher(event.message.getFormattedText());
         if (matcher.find()) {
             xpGain += Float.parseFloat(matcher.group(1));
         }
     }
 
     @SubscribeEvent
-    public void packetReceive(HelperClassPacketEvent.ReceiveEventHelperClass event) {
+    public void packetReceive(PacketEvent.ReceiveEvent event) {
         if (
                 event.packet instanceof S08PacketPlayerPosLook ||
                         event.packet instanceof S09PacketHeldItemChange ||
                         (
-                                event.packet instanceof S19PacketEntityHeadLook && ((AccessorS19) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
+                                event.packet instanceof S19PacketEntityHeadLook && ((S19PacketAccessor) event.packet).getEntityId() == Client.mc.thePlayer.getEntityId()
                         ) ||
                         (
-                                event.packet instanceof S1BPacketEntityAttach && ((S1BPacketEntityAttach) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
+                                event.packet instanceof S1BPacketEntityAttach && ((S1BPacketEntityAttach) event.packet).getEntityId() == Client.mc.thePlayer.getEntityId()
                         ) ||
                         (
-                                event.packet instanceof S18PacketEntityTeleport && ((S18PacketEntityTeleport) event.packet).getEntityId() == CodecClient.mc.thePlayer.getEntityId()
+                                event.packet instanceof S18PacketEntityTeleport && ((S18PacketEntityTeleport) event.packet).getEntityId() == Client.mc.thePlayer.getEntityId()
                         )
         ) {
-            UtilChat.sendMessage("Disabled macro -> failsafe has been triggered");
-            CodecClient.helperClassRotation.reset();
+            Chat.sendMessage("Disabled macro -> failsafe has been triggered");
+            Client.helperClassRotation.reset();
             failSafe = true;
         }
     }
@@ -317,17 +314,17 @@ public class MacroFishing extends HelperClassModule {
 
         if (FailsafeCounter.countUntil(120)) {
 
-            HelperClassSound.enableSounds();
-            CodecClient.mc.thePlayer.playSound("random.anvil_land", 10.f, 1.f);
+            Sound.enableSounds();
+            Client.mc.thePlayer.playSound("random.anvil_land", 10.f, 1.f);
 
-            if (GuiConfig.OnlySound) {
+            if (Config.OnlySound) {
                 return;
             }
 
             switch (FailsafeCounter.get()) {
                 case 20: {
-                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), GuiConfig.RotationSmoothing);
-                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), GuiConfig.RotationSmoothing);
+                    Client.helperClassRotation.setYaw((float) (Client.mc.thePlayer.rotationYaw - 89 + (java.lang.Math.random() * 180)), Config.RotationSmoothing);
+                    Client.helperClassRotation.setPitch((float) (Client.mc.thePlayer.rotationPitch - 14 + (java.lang.Math.random() * 30)), Config.RotationSmoothing);
 
                     KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindBack.getKeyCode(), true);
                     KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindRight.getKeyCode(), true);
@@ -341,16 +338,16 @@ public class MacroFishing extends HelperClassModule {
                 }
 
                 case 60: {
-                    CodecClient.mc.thePlayer.sendChatMessage(FAILSAFE_TEXT[(int) (Math.random() * FAILSAFE_TEXT.length)]);
+                    Client.mc.thePlayer.sendChatMessage(FAILSAFE_TEXT[(int) (java.lang.Math.random() * FAILSAFE_TEXT.length)]);
 
-                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), GuiConfig.RotationSmoothing);
-                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), GuiConfig.RotationSmoothing);
+                    Client.helperClassRotation.setYaw((float) (Client.mc.thePlayer.rotationYaw - 89 + (java.lang.Math.random() * 180)), Config.RotationSmoothing);
+                    Client.helperClassRotation.setPitch((float) (Client.mc.thePlayer.rotationPitch - 14 + (java.lang.Math.random() * 30)), Config.RotationSmoothing);
                     break;
                 }
 
                 case 80: {
-                    CodecClient.helperClassRotation.setYaw((float) (CodecClient.mc.thePlayer.rotationYaw - 89 + (Math.random() * 180)), GuiConfig.RotationSmoothing);
-                    CodecClient.helperClassRotation.setPitch((float) (CodecClient.mc.thePlayer.rotationPitch - 14 + (Math.random() * 30)), GuiConfig.RotationSmoothing);
+                    Client.helperClassRotation.setYaw((float) (Client.mc.thePlayer.rotationYaw - 89 + (java.lang.Math.random() * 180)), Config.RotationSmoothing);
+                    Client.helperClassRotation.setPitch((float) (Client.mc.thePlayer.rotationPitch - 14 + (java.lang.Math.random() * 30)), Config.RotationSmoothing);
                     break;
                 }
 

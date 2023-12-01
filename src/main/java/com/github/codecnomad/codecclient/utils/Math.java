@@ -1,9 +1,9 @@
 package com.github.codecnomad.codecclient.utils;
 
-import com.github.codecnomad.codecclient.CodecClient;
+import com.github.codecnomad.codecclient.Client;
 import net.minecraft.util.BlockPos;
 
-public class UtilMath {
+public class Math {
 
     public static float easeInOut(float t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
@@ -37,10 +37,10 @@ public class UtilMath {
     }
 
     public static float getYaw(BlockPos blockPos) {
-        double deltaX = blockPos.getX() + 0.5 - CodecClient.mc.thePlayer.posX;
-        double deltaZ = blockPos.getZ() + 0.5 - CodecClient.mc.thePlayer.posZ;
-        double yawToBlock = Math.atan2(-deltaX, deltaZ);
-        double yaw = Math.toDegrees(yawToBlock);
+        double deltaX = blockPos.getX() + 0.5 - Client.mc.thePlayer.posX;
+        double deltaZ = blockPos.getZ() + 0.5 - Client.mc.thePlayer.posZ;
+        double yawToBlock = java.lang.Math.atan2(-deltaX, deltaZ);
+        double yaw = java.lang.Math.toDegrees(yawToBlock);
 
         yaw = (yaw + 360) % 360;
         if (yaw > 180) {
@@ -52,13 +52,13 @@ public class UtilMath {
 
 
     public static float getPitch(BlockPos blockPos) {
-        double deltaX = blockPos.getX() + 0.5 - CodecClient.mc.thePlayer.posX;
-        double deltaY = blockPos.getY() + 0.5 - CodecClient.mc.thePlayer.posY - CodecClient.mc.thePlayer.getEyeHeight();
-        double deltaZ = blockPos.getZ() + 0.5 - CodecClient.mc.thePlayer.posZ;
-        double distanceXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-        double pitchToBlock = -Math.atan2(deltaY, distanceXZ);
-        double pitch = Math.toDegrees(pitchToBlock);
-        pitch = Math.max(-90, Math.min(90, pitch));
+        double deltaX = blockPos.getX() + 0.5 - Client.mc.thePlayer.posX;
+        double deltaY = blockPos.getY() + 0.5 - Client.mc.thePlayer.posY - Client.mc.thePlayer.getEyeHeight();
+        double deltaZ = blockPos.getZ() + 0.5 - Client.mc.thePlayer.posZ;
+        double distanceXZ = java.lang.Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+        double pitchToBlock = -java.lang.Math.atan2(deltaY, distanceXZ);
+        double pitch = java.lang.Math.toDegrees(pitchToBlock);
+        pitch = java.lang.Math.max(-90, java.lang.Math.min(90, pitch));
 
         return (float) pitch;
     }

@@ -1,6 +1,6 @@
 package com.github.codecnomad.codecclient.utils;
 
-import com.github.codecnomad.codecclient.CodecClient;
+import com.github.codecnomad.codecclient.Client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 @SuppressWarnings({"unused", "DuplicatedCode"})
-public class UtilRender {
+public class Render {
 
     public static void drawOutlinedFilledBoundingBox(AxisAlignedBB aabb, Color color, float partialTicks) {
         aabb = aabb.offset(-0.001, -0.001, -0.001);
@@ -29,9 +29,9 @@ public class UtilRender {
         GlStateManager.disableTexture2D();
         GlStateManager.depthMask(false);
 
-        double width = Math.max(1 - (CodecClient.mc.thePlayer.getDistance(aabb.minX, aabb.minY, aabb.minZ) / 10 - 2), 2);
-        UtilRender.drawBoundingBox(aabb, color, partialTicks);
-        UtilRender.drawOutlinedBoundingBox(aabb.offset(-0.001, -0.001, -0.001).expand(0.002, 0.002, 0.002), color, (float) width, partialTicks);
+        double width = java.lang.Math.max(1 - (Client.mc.thePlayer.getDistance(aabb.minX, aabb.minY, aabb.minZ) / 10 - 2), 2);
+        Render.drawBoundingBox(aabb, color, partialTicks);
+        Render.drawOutlinedBoundingBox(aabb.offset(-0.001, -0.001, -0.001).expand(0.002, 0.002, 0.002), color, (float) width, partialTicks);
         GlStateManager.depthMask(true);
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
@@ -58,13 +58,13 @@ public class UtilRender {
     }
 
     public static void renderWaypointText(BlockPos pos, String text) {
-        double x = pos.getX() + 0.5 - CodecClient.mc.getRenderManager().viewerPosX;
-        double y = pos.getY() - CodecClient.mc.getRenderManager().viewerPosY;
-        double z = pos.getZ() + 0.5 - CodecClient.mc.getRenderManager().viewerPosZ;
+        double x = pos.getX() + 0.5 - Client.mc.getRenderManager().viewerPosX;
+        double y = pos.getY() - Client.mc.getRenderManager().viewerPosY;
+        double z = pos.getZ() + 0.5 - Client.mc.getRenderManager().viewerPosZ;
 
         FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
         double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(pos.getX(), pos.getY(), pos.getZ());
-        double scaleFactor = 0.005 * Math.sqrt(distance); // Adjust the scaleFactor as needed for proper text size
+        double scaleFactor = 0.005 * java.lang.Math.sqrt(distance); // Adjust the scaleFactor as needed for proper text size
 
         GlStateManager.pushMatrix();
         GlStateManager.pushAttrib();
@@ -76,8 +76,8 @@ public class UtilRender {
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         GlStateManager.translate(x, y, z);
-        GlStateManager.rotate(-CodecClient.mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(CodecClient.mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(-Client.mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(Client.mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
         GlStateManager.scale(-scaleFactor, -scaleFactor, scaleFactor);
 
         // Background rectangle
@@ -98,7 +98,7 @@ public class UtilRender {
         GlStateManager.enableTexture2D();
         fontRenderer.drawString(text, -fontRenderer.getStringWidth(text) / 2, padding, 0xFFFFFF);
 
-        String distanceText = "(" + (int) Math.sqrt(distance) + "m)";
+        String distanceText = "(" + (int) java.lang.Math.sqrt(distance) + "m)";
         int distanceWidth = fontRenderer.getStringWidth(distanceText);
         fontRenderer.drawString(distanceText, -(distanceWidth / 2), padding + rectHeight - 1, 0xFFFFFF);
 
@@ -135,13 +135,13 @@ public class UtilRender {
     }
 
     public static void draw3DStringWithShadow(Vec3 pos, String str, float partialTicks) {
-        EntityPlayer player = CodecClient.mc.thePlayer;
+        EntityPlayer player = Client.mc.thePlayer;
         double x = (pos.xCoord - player.lastTickPosX) + ((pos.xCoord - player.posX) - (pos.xCoord - player.lastTickPosX)) * partialTicks;
         double y = (pos.yCoord - player.lastTickPosY) + ((pos.yCoord - player.posY) - (pos.yCoord - player.lastTickPosY)) * partialTicks;
         double z = (pos.zCoord - player.lastTickPosZ) + ((pos.zCoord - player.posZ) - (pos.zCoord - player.lastTickPosZ)) * partialTicks;
-        RenderManager renderManager = CodecClient.mc.getRenderManager();
+        RenderManager renderManager = Client.mc.getRenderManager();
 
-        FontRenderer fontrenderer = CodecClient.mc.fontRendererObj;
+        FontRenderer fontrenderer = Client.mc.fontRendererObj;
         float f = 1.6F;
         float f1 = 0.016666668F * f;
         GlStateManager.pushMatrix();

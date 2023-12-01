@@ -1,11 +1,10 @@
-package com.github.codecnomad.codecclient.classes;
+package com.github.codecnomad.codecclient.utils;
 
-import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.utils.UtilMath;
+import com.github.codecnomad.codecclient.Client;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-public class HelperClassRotation {
+public class Rotation {
     public boolean updateYaw = false;
     public boolean updatePitch = false;
     private float yawGoal = 0;
@@ -33,15 +32,15 @@ public class HelperClassRotation {
     @SubscribeEvent
     public void clientTick(TickEvent.ClientTickEvent event) {
         if (updateYaw) {
-            CodecClient.mc.thePlayer.rotationYaw = UtilMath.interpolate(yawGoal, CodecClient.mc.thePlayer.rotationYaw, (float) 1 / yawSmooth);
-            if (Math.abs(CodecClient.mc.thePlayer.rotationYaw - yawGoal) < 3f) {
+            Client.mc.thePlayer.rotationYaw = Math.interpolate(yawGoal, Client.mc.thePlayer.rotationYaw, (float) 1 / yawSmooth);
+            if (java.lang.Math.abs(Client.mc.thePlayer.rotationYaw - yawGoal) < 3f) {
                 updateYaw = false;
             }
         }
 
         if (updatePitch) {
-            CodecClient.mc.thePlayer.rotationPitch = UtilMath.interpolate(pitchGoal, CodecClient.mc.thePlayer.rotationPitch, (float) 1 / pitchSmooth);
-            if (Math.abs(CodecClient.mc.thePlayer.rotationPitch - pitchGoal) < 3f) {
+            Client.mc.thePlayer.rotationPitch = Math.interpolate(pitchGoal, Client.mc.thePlayer.rotationPitch, (float) 1 / pitchSmooth);
+            if (java.lang.Math.abs(Client.mc.thePlayer.rotationPitch - pitchGoal) < 3f) {
                 updatePitch = false;
             }
         }

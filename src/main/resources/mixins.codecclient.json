@@ -4,10 +4,7 @@
   "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "AccessorS19"
-  ],
-  "client": [
-    "MixinSendPacket",
-    "MixinReceivePacket"
+    "NetworkManagerMixin",
+    "S19PacketAccessor"
   ]
 }

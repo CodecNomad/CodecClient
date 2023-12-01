@@ -1,20 +1,20 @@
-package com.github.codecnomad.codecclient.guis;
+package com.github.codecnomad.codecclient.ui;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.hud.BasicHud;
 import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import cc.polyfrost.oneconfig.renderer.NanoVGHelper;
 import cc.polyfrost.oneconfig.renderer.font.Fonts;
-import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.utils.UtilMath;
+import com.github.codecnomad.codecclient.Client;
+import com.github.codecnomad.codecclient.utils.Math;
 
-import static com.github.codecnomad.codecclient.modules.MacroFishing.*;
+import static com.github.codecnomad.codecclient.modules.FishingMacro.*;
 
-public class HudFishing extends BasicHud {
+public class FishingHud extends BasicHud {
 
     @Override
     protected void draw(UMatrixStack matrices, float x, float y, float scale, boolean example) {
-        if (!CodecClient.modules.get("FishingMacro").state) {
+        if (!Client.modules.get("FishingMacro").state) {
             return;
         }
 
@@ -29,16 +29,16 @@ public class HudFishing extends BasicHud {
                     x + this.getWidth(this.getScale(), false) + 5 * scale,
                     y - 5 * scale,
                     1 * scale,
-                    GuiConfig.VisualColor.getRGB()
+                    Config.VisualColor.getRGB()
             );
 
             NanoVGHelper.INSTANCE.drawText(vg,
                     String.format(
-                            "FISHING (%s)", UtilMath.toClock(elapsedTimeSeconds)
+                            "FISHING (%s)", Math.toClock(elapsedTimeSeconds)
                     ),
                     x,
                     y + (3 * scale),
-                    GuiConfig.VisualColor.getRGB(),
+                    Config.VisualColor.getRGB(),
                     (6f * scale),
                     Fonts.BOLD
             );
@@ -50,10 +50,10 @@ public class HudFishing extends BasicHud {
             ;
 
             NanoVGHelper.INSTANCE.drawText(vg,
-                    String.valueOf(UtilMath.toFancyNumber(averageCPH)),
+                    String.valueOf(Math.toFancyNumber(averageCPH)),
                     x + (30 * scale),
                     y + (9 * scale),
-                    GuiConfig.VisualColor.getRGB(),
+                    Config.VisualColor.getRGB(),
                     (4f * scale),
                     Fonts.REGULAR
             );
@@ -68,10 +68,10 @@ public class HudFishing extends BasicHud {
             );
 
             NanoVGHelper.INSTANCE.drawText(vg,
-                    String.valueOf(UtilMath.toFancyNumber(catches)),
+                    String.valueOf(Math.toFancyNumber(catches)),
                     x + (30 * scale),
                     y + (13 * scale),
-                    GuiConfig.VisualColor.getRGB(),
+                    Config.VisualColor.getRGB(),
                     (4f * scale),
                     Fonts.REGULAR
             );
@@ -80,7 +80,7 @@ public class HudFishing extends BasicHud {
                     "SKILLS",
                     x,
                     y + (22 * scale),
-                    GuiConfig.VisualColor.getRGB(),
+                    Config.VisualColor.getRGB(),
                     (6f * scale),
                     Fonts.BOLD
 
@@ -95,10 +95,10 @@ public class HudFishing extends BasicHud {
             );
 
             NanoVGHelper.INSTANCE.drawText(vg,
-                    String.valueOf(UtilMath.toFancyNumber(averageXPH)),
+                    String.valueOf(Math.toFancyNumber(averageXPH)),
                     x + (30 * scale),
                     y + (28 * scale),
-                    GuiConfig.VisualColor.getRGB(),
+                    Config.VisualColor.getRGB(),
                     (4f * scale),
                     Fonts.REGULAR
             );
@@ -113,10 +113,10 @@ public class HudFishing extends BasicHud {
             );
 
             NanoVGHelper.INSTANCE.drawText(vg,
-                    String.valueOf(UtilMath.toFancyNumber((int) xpGain)),
+                    String.valueOf(Math.toFancyNumber((int) xpGain)),
                     x + (30 * scale),
                     y + (32 * scale),
-                    GuiConfig.VisualColor.getRGB(),
+                    Config.VisualColor.getRGB(),
                     (4f * scale),
                     Fonts.REGULAR
             );
@@ -126,7 +126,7 @@ public class HudFishing extends BasicHud {
                     y + (37 * scale),
                     x + this.getWidth(this.getScale(), false) + (5 * scale),
                     y + (37 * scale), (1 * scale),
-                    GuiConfig.VisualColor.getRGB());
+                    Config.VisualColor.getRGB());
         });
     }
 
@@ -134,7 +134,7 @@ public class HudFishing extends BasicHud {
     protected float getWidth(float scale, boolean example) {
         int elapsedTimeSeconds = (int) (System.currentTimeMillis() / 1000 - startTime);
         return (String.format(
-                "FISHING (%s)", UtilMath.toClock(elapsedTimeSeconds)
+                "FISHING (%s)", Math.toClock(elapsedTimeSeconds)
         )).length() * (3 * scale);
     }
 
@@ -145,6 +145,6 @@ public class HudFishing extends BasicHud {
 
     @Override
     protected boolean shouldDrawBackground() {
-        return CodecClient.modules.get("FishingMacro").state;
+        return Client.modules.get("FishingMacro").state;
     }
 }

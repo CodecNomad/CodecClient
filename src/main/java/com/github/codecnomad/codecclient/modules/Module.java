@@ -1,12 +1,9 @@
-package com.github.codecnomad.codecclient.classes;
+package com.github.codecnomad.codecclient.modules;
 
 import net.minecraftforge.common.MinecraftForge;
 
-public class HelperClassModule {
+public class Module {
     public boolean state;
-
-    public HelperClassModule() {
-    }
 
     public void register() {
         MinecraftForge.EVENT_BUS.register(this);

@@ -1,6 +1,6 @@
-package com.github.codecnomad.codecclient.classes;
+package com.github.codecnomad.codecclient.utils;
 
-public class HelperClassCounter {
+public class Counter {
     private int count;
 
     public boolean countUntil(int threshold) {

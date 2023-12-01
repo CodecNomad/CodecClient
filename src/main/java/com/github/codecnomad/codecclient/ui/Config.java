@@ -1,4 +1,4 @@
-package com.github.codecnomad.codecclient.guis;
+package com.github.codecnomad.codecclient.ui;
 
 import cc.polyfrost.oneconfig.config.annotations.Number;
 import cc.polyfrost.oneconfig.config.annotations.*;
@@ -6,12 +6,12 @@ import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
-import com.github.codecnomad.codecclient.CodecClient;
-import com.github.codecnomad.codecclient.classes.HelperClassModule;
+import com.github.codecnomad.codecclient.Client;
+import com.github.codecnomad.codecclient.modules.Module;
 import org.lwjgl.input.Keyboard;
 
 @SuppressWarnings("unused")
-public class GuiConfig extends cc.polyfrost.oneconfig.config.Config {
+public class Config extends cc.polyfrost.oneconfig.config.Config {
     @Color(
             name = "Color",
             category = "Visuals"
@@ -75,16 +75,16 @@ public class GuiConfig extends cc.polyfrost.oneconfig.config.Config {
             name = "Fishing HUD",
             category = "Visuals"
     )
-    public HudFishing hudFishing = new HudFishing();
+    public FishingHud hudFishing = new FishingHud();
 
-    public GuiConfig() {
+    public Config() {
         super(new Mod("CodecClient", ModType.UTIL_QOL, "https://cdn.discordapp.com/avatars/1163205190267175075/7d1152c4d56b3afa5cc2cd8d21258850?size=1024"), "config.json");
         this.registerKeyBind(FishingKeybinding, () -> toggle("FishingMacro"));
         initialize();
     }
 
     private static void toggle(String name) {
-        HelperClassModule helperClassModule = CodecClient.modules.get(name);
+        Module helperClassModule = Client.modules.get(name);
         if (helperClassModule.state) {
             helperClassModule.unregister();
         } else {

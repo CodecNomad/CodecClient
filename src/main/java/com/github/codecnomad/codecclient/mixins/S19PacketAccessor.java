@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(S19PacketEntityHeadLook.class)
-public interface AccessorS19 {
+public interface S19PacketAccessor {
     @Accessor("entityId")
     int getEntityId();
 }
