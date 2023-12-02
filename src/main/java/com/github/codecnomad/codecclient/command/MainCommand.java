@@ -5,7 +5,7 @@ import cc.polyfrost.oneconfig.utils.commands.annotations.Main;
 import com.github.codecnomad.codecclient.Client;
 
 @SuppressWarnings("unused")
-@Command(value = "codecclient", aliases = {"cc"})
+@Command(value = "codecclient", aliases = {"codec"})
 public class MainCommand {
         @Main
         public void mainCommand() {
