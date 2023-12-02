@@ -63,8 +63,8 @@ public class FishingMacro extends Module {
         MinecraftForge.EVENT_BUS.unregister(this);
         this.state = false;
 
-        Client.helperClassRotation.updatePitch = false;
-        Client.helperClassRotation.updateYaw = false;
+        Client.rotation.updatePitch = false;
+        Client.rotation.updateYaw = false;
 
         Sound.enableSounds();
 
@@ -119,7 +119,7 @@ public class FishingMacro extends Module {
             }
 
             case FIND_ROD: {
-                for (int slotIndex = 0; slotIndex < Client.mc.thePlayer.inventory.getSizeInventory(); slotIndex++) {
+                for (int slotIndex = 0; slotIndex < 9; slotIndex++) {
                     ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
                     if (stack != null && stack.getItem() instanceof ItemFishingRod) {
                         Client.mc.thePlayer.inventory.currentItem = slotIndex;
@@ -143,15 +143,15 @@ public class FishingMacro extends Module {
 
                 BlockPos randomWater = waterBlocks.get((int) (java.lang.Math.random() * waterBlocks.size()));
                 currentWaterBlock = randomWater;
-                Client.helperClassRotation.setYaw((float) (Math.getYaw(randomWater) - 2 + java.lang.Math.random() * 3), Config.RotationSmoothing);
-                Client.helperClassRotation.setPitch((float) (Math.getPitch(randomWater) - 2 + java.lang.Math.random() * 3), Config.RotationSmoothing);
+                Client.rotation.setYaw((float) (Math.getYaw(randomWater) - 2 + java.lang.Math.random() * 3), Config.RotationSmoothing);
+                Client.rotation.setPitch((float) (Math.getPitch(randomWater) - 2 + java.lang.Math.random() * 3), Config.RotationSmoothing);
 
                 currentStep = FishingSteps.CAST_HOOK;
                 return;
             }
 
             case CAST_HOOK: {
-                if (Client.helperClassRotation.updateYaw || Client.helperClassRotation.updatePitch) {
+                if (Client.rotation.updateYaw || Client.rotation.updatePitch) {
                     return;
                 }
 
@@ -232,8 +232,8 @@ public class FishingMacro extends Module {
                 double deltaZ = boundingBox.maxZ - boundingBox.minZ;
 
                 BlockPos randomPositionOnBoundingBox = new BlockPos(boundingBox.minX + deltaX, boundingBox.minY + deltaY, boundingBox.minZ + deltaZ);
-                Client.helperClassRotation.setYaw(Math.getYaw(randomPositionOnBoundingBox), Config.RotationSmoothing);
-                Client.helperClassRotation.setPitch(Math.getPitch(randomPositionOnBoundingBox), Config.RotationSmoothing);
+                Client.rotation.setYaw(Math.getYaw(randomPositionOnBoundingBox), Config.RotationSmoothing);
+                Client.rotation.setPitch(Math.getPitch(randomPositionOnBoundingBox), Config.RotationSmoothing);
 
                 if (!MainCounter.countUntil(20 / Config.AttackCps)) {
                     MainCounter.add(java.lang.Math.random() * 100 > 70 ? 1 : 0);
@@ -301,7 +301,7 @@ public class FishingMacro extends Module {
                         )
         ) {
             Chat.sendMessage("Disabled macro -> failsafe has been triggered");
-            Client.helperClassRotation.reset();
+            Client.rotation.reset();
             failSafe = true;
         }
     }
@@ -323,8 +323,8 @@ public class FishingMacro extends Module {
 
             switch (FailsafeCounter.get()) {
                 case 20: {
-                    Client.helperClassRotation.setYaw((float) (Client.mc.thePlayer.rotationYaw - 89 + (java.lang.Math.random() * 180)), Config.RotationSmoothing);
-                    Client.helperClassRotation.setPitch((float) (Client.mc.thePlayer.rotationPitch - 14 + (java.lang.Math.random() * 30)), Config.RotationSmoothing);
+                    Client.rotation.setYaw((float) (Client.mc.thePlayer.rotationYaw - 89 + (java.lang.Math.random() * 180)), Config.RotationSmoothing);
+                    Client.rotation.setPitch((float) (Client.mc.thePlayer.rotationPitch - 14 + (java.lang.Math.random() * 30)), Config.RotationSmoothing);
 
                     KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindBack.getKeyCode(), true);
                     KeyBinding.setKeyBindState(Minecraft.getMinecraft().gameSettings.keyBindRight.getKeyCode(), true);
@@ -340,14 +340,14 @@ public class FishingMacro extends Module {
                 case 60: {
                     Client.mc.thePlayer.sendChatMessage(FAILSAFE_TEXT[(int) (java.lang.Math.random() * FAILSAFE_TEXT.length)]);
 
-                    Client.helperClassRotation.setYaw((float) (Client.mc.thePlayer.rotationYaw - 89 + (java.lang.Math.random() * 180)), Config.RotationSmoothing);
-                    Client.helperClassRotation.setPitch((float) (Client.mc.thePlayer.rotationPitch - 14 + (java.lang.Math.random() * 30)), Config.RotationSmoothing);
+                    Client.rotation.setYaw((float) (Client.mc.thePlayer.rotationYaw - 89 + (java.lang.Math.random() * 180)), Config.RotationSmoothing);
+                    Client.rotation.setPitch((float) (Client.mc.thePlayer.rotationPitch - 14 + (java.lang.Math.random() * 30)), Config.RotationSmoothing);
                     break;
                 }
 
                 case 80: {
-                    Client.helperClassRotation.setYaw((float) (Client.mc.thePlayer.rotationYaw - 89 + (java.lang.Math.random() * 180)), Config.RotationSmoothing);
-                    Client.helperClassRotation.setPitch((float) (Client.mc.thePlayer.rotationPitch - 14 + (java.lang.Math.random() * 30)), Config.RotationSmoothing);
+                    Client.rotation.setYaw((float) (Client.mc.thePlayer.rotationYaw - 89 + (java.lang.Math.random() * 180)), Config.RotationSmoothing);
+                    Client.rotation.setPitch((float) (Client.mc.thePlayer.rotationPitch - 14 + (java.lang.Math.random() * 30)), Config.RotationSmoothing);
                     break;
                 }
 

@@ -1,9 +1,11 @@
 package com.github.codecnomad.codecclient;
 
-import com.github.codecnomad.codecclient.modules.Module;
-import com.github.codecnomad.codecclient.utils.Rotation;
-import com.github.codecnomad.codecclient.ui.Config;
+import cc.polyfrost.oneconfig.utils.commands.CommandManager;
+import com.github.codecnomad.codecclient.command.MainCommand;
 import com.github.codecnomad.codecclient.modules.FishingMacro;
+import com.github.codecnomad.codecclient.modules.Module;
+import com.github.codecnomad.codecclient.ui.Config;
+import com.github.codecnomad.codecclient.utils.Rotation;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -18,7 +20,7 @@ import java.util.Map;
 public class Client {
     public static Map<String, Module> modules = new HashMap<>();
     public static Minecraft mc = Minecraft.getMinecraft();
-    public static Rotation helperClassRotation = new Rotation();
+    public static Rotation rotation = new Rotation();
     public static Config guiConfig;
 
     static {
@@ -30,7 +32,9 @@ public class Client {
         guiConfig = new Config();
 
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(helperClassRotation);
+        MinecraftForge.EVENT_BUS.register(rotation);
+
+        CommandManager.register(new MainCommand());
     }
 
     @SubscribeEvent
