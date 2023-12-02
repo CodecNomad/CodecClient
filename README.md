@@ -4,4 +4,4 @@
 - entity esp
 
 ## Discord:
-https://discord.gg/tF5CnkBU
+https://discord.com/invite/sKr4KwSkwG
