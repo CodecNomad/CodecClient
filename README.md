@@ -2,6 +2,6 @@
 ---
 ## Features:
 - fishing macro
-- 
+
 ## Discord:
 https://discord.com/invite/sKr4KwSkwG
