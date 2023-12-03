@@ -57,6 +57,15 @@ public class Config extends cc.polyfrost.oneconfig.config.Config {
     )
     public static int RotationSmoothing = 4;
 
+    @Number(
+            name = "Random movement frequency",
+            category = "Macros",
+            subcategory = "Fishing",
+            min = 5,
+            max = 50
+    )
+    public static int MovementFrequency = 15;
+
     @Switch(
             name = "Auto kill",
             category = "Macros",
