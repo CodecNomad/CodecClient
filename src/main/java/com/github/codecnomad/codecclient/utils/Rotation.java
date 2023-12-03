@@ -33,14 +33,14 @@ public class Rotation {
     public void clientTick(TickEvent.ClientTickEvent event) {
         if (updateYaw) {
             Client.mc.thePlayer.rotationYaw = Math.interpolate(yawGoal, Client.mc.thePlayer.rotationYaw, (float) 1 / yawSmooth);
-            if (java.lang.Math.abs(Client.mc.thePlayer.rotationYaw - yawGoal) < 3f) {
+            if (java.lang.Math.abs(Client.mc.thePlayer.rotationYaw - yawGoal) < java.lang.Math.random() * 3) {
                 updateYaw = false;
             }
         }
 
         if (updatePitch) {
             Client.mc.thePlayer.rotationPitch = Math.interpolate(pitchGoal, Client.mc.thePlayer.rotationPitch, (float) 1 / pitchSmooth);
-            if (java.lang.Math.abs(Client.mc.thePlayer.rotationPitch - pitchGoal) < 3f) {
+            if (java.lang.Math.abs(Client.mc.thePlayer.rotationPitch - pitchGoal) < java.lang.Math.random() * 3) {
                 updatePitch = false;
             }
         }
