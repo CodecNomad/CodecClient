@@ -1,16 +1,12 @@
 package com.github.codecnomad.codecclient.modules;
 
 import com.github.codecnomad.codecclient.Client;
-import com.github.codecnomad.codecclient.utils.*;
 import com.github.codecnomad.codecclient.events.PacketEvent;
-import com.github.codecnomad.codecclient.ui.Config;
 import com.github.codecnomad.codecclient.mixins.S19PacketAccessor;
+import com.github.codecnomad.codecclient.ui.Config;
 import com.github.codecnomad.codecclient.utils.Math;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDynamicLiquid;
-import net.minecraft.block.BlockStaticLiquid;
+import com.github.codecnomad.codecclient.utils.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
@@ -20,7 +16,6 @@ import net.minecraft.item.*;
 import net.minecraft.network.play.server.*;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,8 +23,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 
 @SuppressWarnings("DuplicatedCode")
@@ -38,20 +31,24 @@ public class FishingMacro extends Module {
     public static int startTime = 0;
     public static int catches = 0;
     public static float xpGain = 0;
-    public FishingSteps currentStep = FishingSteps.FIND_ROD;
-    public Counter MainCounter = new Counter();
-    public Counter FailsafeCounter = new Counter();
-    public boolean failSafe = false;
+    public static FishingSteps currentStep = FishingSteps.FIND_ROD;
+    public static Counter MainCounter = new Counter();
+    public static Counter AlternativeCounter = new Counter();
+    public static Counter FailsafeCounter = new Counter();
+    public static boolean failSafe = false;
     Entity fishingHook = null;
     Entity fishingMarker = null;
     Entity fishingMonster = null;
-    List<BlockPos> waterBlocks = new ArrayList<>();
-    BlockPos currentWaterBlock = null;
+    public static float lastYaw = 0;
+    public static float lastPitch = 0;
+    public static AxisAlignedBB lastAABB = null;
 
     @Override
     public void register() {
         MinecraftForge.EVENT_BUS.register(this);
         this.state = true;
+        lastYaw = Client.mc.thePlayer.rotationYaw;
+        lastPitch = Client.mc.thePlayer.rotationPitch;
 
         Sound.disableSounds();
 
@@ -65,6 +62,8 @@ public class FishingMacro extends Module {
 
         Client.rotation.updatePitch = false;
         Client.rotation.updateYaw = false;
+        lastPitch = 0;
+        lastYaw = 0;
 
         Sound.enableSounds();
 
@@ -72,15 +71,15 @@ public class FishingMacro extends Module {
         catches = 0;
         xpGain = 0;
 
-        currentStep = FishingSteps.FIND_WATER;
+        currentStep = FishingSteps.FIND_ROD;
         MainCounter.reset();
         FailsafeCounter.reset();
         failSafe = false;
         fishingHook = null;
         fishingMarker = null;
         fishingMonster = null;
-        waterBlocks.clear();
-        currentWaterBlock = null;
+
+        lastAABB = null;
     }
 
     @SubscribeEvent
@@ -90,40 +89,14 @@ public class FishingMacro extends Module {
         }
 
         switch (currentStep) {
-            case FIND_WATER: {
-                for (int x = -8; x <= 8; x++) {
-                    for (int y = -1; y <= 1; y++) {
-                        for (int z = -8; z <= 8; z++) {
-                            BlockPos pos = new BlockPos(
-                                    Client.mc.thePlayer.posX + x,
-                                    Client.mc.thePlayer.posY + y,
-                                    Client.mc.thePlayer.posZ + z
-                            );
-
-                            Block block = Client.mc.theWorld.getBlockState(pos).getBlock();
-
-                            if ((block instanceof BlockStaticLiquid || block instanceof BlockDynamicLiquid)
-                                    && Client.mc.theWorld.rayTraceBlocks(
-                                    new Vec3(Client.mc.thePlayer.posX, Client.mc.thePlayer.posY + Client.mc.thePlayer.getEyeHeight() / 2, Client.mc.thePlayer.posZ),
-                                    new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5),
-                                    false, true, false
-                            ) == null) {
-                                waterBlocks.add(pos);
-                            }
-                        }
-                    }
-                }
-
-                currentStep = FishingSteps.FIND_ROD;
-                return;
-            }
-
             case FIND_ROD: {
                 for (int slotIndex = 0; slotIndex < 9; slotIndex++) {
                     ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
                     if (stack != null && stack.getItem() instanceof ItemFishingRod) {
+                        Client.rotation.setYaw(lastYaw, Config.RotationSmoothing);
+                        Client.rotation.setPitch(lastPitch, Config.RotationSmoothing);
                         Client.mc.thePlayer.inventory.currentItem = slotIndex;
-                        currentStep = FishingSteps.LOOK_TO_NEW_BLOCK;
+                        currentStep = FishingSteps.CAST_HOOK;
                         return;
                     }
                 }
@@ -131,22 +104,6 @@ public class FishingMacro extends Module {
                 Chat.sendMessage("Disabled macro -> couldn't find rod.");
                 this.unregister();
 
-                return;
-            }
-
-            case LOOK_TO_NEW_BLOCK: {
-                if (waterBlocks.isEmpty()) {
-                    Chat.sendMessage("Disabled macro -> couldn't find any water.");
-                    this.unregister();
-                    return;
-                }
-
-                BlockPos randomWater = waterBlocks.get((int) (java.lang.Math.random() * waterBlocks.size()));
-                currentWaterBlock = randomWater;
-                Client.rotation.setYaw((float) (Math.getYaw(randomWater) - 2 + java.lang.Math.random() * 3), Config.RotationSmoothing);
-                Client.rotation.setPitch((float) (Math.getPitch(randomWater) - 2 + java.lang.Math.random() * 3), Config.RotationSmoothing);
-
-                currentStep = FishingSteps.CAST_HOOK;
                 return;
             }
 
@@ -164,6 +121,31 @@ public class FishingMacro extends Module {
             case WAIT_FOR_CATCH: {
                 if (MainCounter.countUntil(Config.FishingDelay)) {
                     return;
+                }
+
+                if (!AlternativeCounter.countUntil(10)) {
+                    if (fishingHook == null) {
+                        currentStep = FishingSteps.FIND_ROD;
+                        return;
+                    }
+
+                    AxisAlignedBB aabb = fishingHook.getEntityBoundingBox();
+
+                    double expandedMinX = aabb.minX - 1;
+                    double expandedMinY = aabb.minY - 1;
+                    double expandedMinZ = aabb.minZ - 1;
+                    double expandedMaxX = aabb.maxX + 1;
+                    double expandedMaxY = aabb.maxY + 1;
+                    double expandedMaxZ = aabb.maxZ + 1;
+
+                    lastAABB = new AxisAlignedBB(expandedMinX, expandedMinY, expandedMinZ, expandedMaxX, expandedMaxY, expandedMaxZ);
+
+                    double randomX = expandedMinX + java.lang.Math.random() * (expandedMaxX - expandedMinX);
+                    double randomY = expandedMinY + java.lang.Math.random() * (expandedMaxY - expandedMinY);
+                    double randomZ = expandedMinZ + java.lang.Math.random() * (expandedMaxZ - expandedMinZ);
+
+                    Client.rotation.setYaw(Math.getYaw(new BlockPos(randomX, randomY, randomZ)), 5);
+                    Client.rotation.setPitch(Math.getPitch(new BlockPos(randomX, randomY, randomZ)), 5);
                 }
 
                 for (Entity entity : Client.mc.theWorld.loadedEntityList) {
@@ -217,8 +199,8 @@ public class FishingMacro extends Module {
                     if (stack != null &&
                             (
                                     stack.getItem() instanceof ItemSpade ||
-                                    stack.getItem() instanceof ItemSword ||
-                                    stack.getItem() instanceof ItemAxe
+                                            stack.getItem() instanceof ItemSword ||
+                                            stack.getItem() instanceof ItemAxe
                             )
                     ) {
                         Client.mc.thePlayer.inventory.currentItem = slotIndex;
@@ -244,14 +226,9 @@ public class FishingMacro extends Module {
     }
 
     @SubscribeEvent
-    public void renderLast(RenderWorldLastEvent event) {
-        if (currentWaterBlock != null) {
-            GlStateManager.disableDepth();
-            Render.drawOutlinedFilledBoundingBox(
-                    currentWaterBlock,
-                    Config.VisualColor.toJavaColor(),
-                    event.partialTicks);
-            GlStateManager.enableDepth();
+    public void renderWorld(RenderWorldLastEvent event) {
+        if (lastAABB != null) {
+            Render.drawOutlinedFilledBoundingBox(lastAABB, Config.VisualColor.toJavaColor(), event.partialTicks);
         }
     }
 
@@ -368,9 +345,7 @@ public class FishingMacro extends Module {
     }
 
     public enum FishingSteps {
-        FIND_WATER,
         FIND_ROD,
-        LOOK_TO_NEW_BLOCK,
         CAST_HOOK,
         WAIT_FOR_CATCH,
         CATCH,
