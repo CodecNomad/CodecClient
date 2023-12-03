@@ -215,7 +215,7 @@ public class FishingMacro extends Module {
 
                 if (isHype) {
                     Client.rotation.setPitch(-90, 4);
-                    if (!MainCounter.countUntil(20 / Config.AttackCps) && Client.mc.thePlayer.rotationYaw == 90) {
+                    if (!MainCounter.countUntil(20 / Config.AttackCps) && Client.mc.thePlayer.rotationYaw < -86) {
                         MainCounter.add(java.lang.Math.random() * 100 > 70 ? 1 : 0);
                         KeyBinding.onTick(Client.mc.gameSettings.keyBindUseItem.getKeyCode());
                     }
