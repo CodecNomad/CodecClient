@@ -1,7 +1,7 @@
-# A hypixel utility client
+# Macros with actual effort put into them, unlike Jido...
+---
 ## Features:
 - fishing macro
-- entity esp
-
+- 
 ## Discord:
 https://discord.com/invite/sKr4KwSkwG
