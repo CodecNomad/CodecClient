@@ -18,8 +18,6 @@ public class Walker {
     List<BlockPos> wayPoints;
     Runnable callback;
     int currentPoint = 0;
-    double previousMotion = 0;
-
 
     public void start() {
         MinecraftForge.EVENT_BUS.register(this);
@@ -27,7 +25,6 @@ public class Walker {
 
     public void stop() {
         currentPoint = 0;
-        previousMotion = 0;
         MinecraftForge.EVENT_BUS.unregister(this);
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), false);
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), false);
@@ -45,23 +42,18 @@ public class Walker {
             BlockPos iPos = wayPoints.get(i);
             BlockPos pPos = Client.mc.thePlayer.getPosition();
             if (Client.mc.theWorld.rayTraceBlocks(new Vec3(iPos.getX(), iPos.getY(), iPos.getZ()), new Vec3(pPos.getX(), pPos.getY(), pPos.getZ())) == null) {
-                Chat.sendMessage(String.format("Jumped currentPoints: %d", i));
                 currentPoint = i;
             }
         }
 
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), true);
 
-
-        if (wayPoints.get(currentPoint).getY() == Client.mc.thePlayer.posY + 1) {
-            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), true);
-        }
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), java.lang.Math.abs(Client.mc.thePlayer.motionX) + java.lang.Math.abs(Client.mc.thePlayer.motionZ) < 0.05 && wayPoints.get(currentPoint).getY() > Client.mc.thePlayer.posY);
 
         Client.rotation.setYaw(Math.getYaw(wayPoints.get(currentPoint)), Config.RotationSmoothing);
         Client.rotation.setPitch(Math.getPitch(wayPoints.get(currentPoint)), Config.RotationSmoothing);
 
-
-        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint)) < 1) {
+        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint)) < 2) {
             currentPoint++;
         }
     }

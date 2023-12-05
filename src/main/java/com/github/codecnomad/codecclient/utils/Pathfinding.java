@@ -78,6 +78,10 @@ public class Pathfinding {
                     continue;
                 }
 
+                if (!isNotInCollection(new Node(m.p.add(0, 1, 0)), O)) {
+                    continue;
+                }
+
                 if (isNotInCollection(m, C)) {
                     m.g = n.g + 1;
                     m.f = m.g + m.p.distanceSq(t);
