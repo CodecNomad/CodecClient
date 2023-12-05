@@ -6,7 +6,7 @@ import net.minecraft.util.BlockPos;
 public class Math {
 
     public static float easeInOut(float t) {
-        return t * t * t * (t * (t * 6 - 15) + 10);
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     }
 
     public static float interpolate(float goal, float current, float time) {

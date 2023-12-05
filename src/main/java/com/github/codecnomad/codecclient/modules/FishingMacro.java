@@ -194,7 +194,6 @@ public class FishingMacro extends Module {
                     return;
                 }
 
-                boolean isHype = false;
                 for (int slotIndex = 0; slotIndex < 9; slotIndex++) {
                     ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
                     if (stack != null &&
@@ -204,23 +203,9 @@ public class FishingMacro extends Module {
                                             stack.getItem() instanceof ItemAxe
                             )
                     ) {
-                        if (stack.getDisplayName().contains("Hyperion")) {
-                            isHype = true;
-                        }
-
                         Client.mc.thePlayer.inventory.currentItem = slotIndex;
                         break;
                     }
-                }
-
-                if (isHype) {
-                    Client.rotation.setPitch(-90, 4);
-                    if (!MainCounter.countUntil(20 / Config.AttackCps) && Client.mc.thePlayer.rotationYaw < -86) {
-                        MainCounter.add(java.lang.Math.random() * 100 > 70 ? 1 : 0);
-                        KeyBinding.onTick(Client.mc.gameSettings.keyBindUseItem.getKeyCode());
-                    }
-
-                    return;
                 }
 
                 AxisAlignedBB boundingBox = fishingMonster.getEntityBoundingBox();
