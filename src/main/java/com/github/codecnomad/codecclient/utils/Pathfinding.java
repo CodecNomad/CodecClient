@@ -3,10 +3,12 @@ package com.github.codecnomad.codecclient.utils;
 import com.github.codecnomad.codecclient.Client;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.Vec3;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 class Node {
     public Node parent;
@@ -14,110 +16,84 @@ class Node {
     public double g;
     public BlockPos p;
 
-    public Node(BlockPos p) {
+    public Node(BlockPos p, double f) {
         this.p = p;
+        this.f = f;
     }
 }
 
 public class Pathfinding {
-    Collection<Node> O;
-    Collection<Node> C;
+    private final Collection<Node> O = new ArrayList<>();
+    private final Collection<Node> C = new ArrayList<>();
 
-    public Pathfinding() {
-        O = new ArrayList<>();
-        C = new ArrayList<>();
-    }
+    public List<BlockPos> createPath(BlockPos s, BlockPos t) {
+        double l = s.distanceSq(t);
+        O.add(new Node(s, l));
 
-    public List<BlockPos> getPath(BlockPos s, BlockPos t) {
-        C.clear();
-        O.clear();
-        O.add(new Node(s));
-
-        int upperBound = (int) (s.distanceSq(t) * 2);
-        int i = 0;
-        while (!O.isEmpty()) {
-            if (i > upperBound) {
-                return new ArrayList<>();
-            }
-            i++;
-
+        for (int i = 0; i < l*2 && !O.isEmpty(); i++) {
             Node n = null;
-            double bestF = Double.MAX_VALUE;
-            for (Node node : O) {
-                if (node.f < bestF) {
-                    n = node;
-                    bestF = node.f;
+            double b = Double.MAX_VALUE;
+            for (Node n1 : O) {
+                if (n1.f < b) {
+                    n = n1;
+                    b = n1.f;
                 }
             }
 
-            O.remove(n);
-            C.add(n);
-
-            assert n != null;
-            if (n.p.equals(t)) {
-                List<BlockPos> path = new ArrayList<>();
+            if (Objects.requireNonNull(n).p.equals(t)) {
+                List<BlockPos> p = new ArrayList<>();
                 while (n != null) {
-                    path.add(0, n.p);
+                    p.add(0, n.p);
                     n = n.parent;
                 }
-                return path;
+
+                return p;
             }
 
-            List<Node> nb = new ArrayList<>();
-            nb.add(new Node(n.p.add(0, 0, 1)));
-            nb.add(new Node(n.p.add(0, 0, -1)));
-            nb.add(new Node(n.p.add(1, 0, 0)));
-            nb.add(new Node(n.p.add(-1, 0, 0)));
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    for (int y = -1; y <= 1; y++) {
+                        BlockPos mp = new BlockPos(n.p.add(x, y, z));
+                        Node m = new Node(mp, mp.distanceSq(t));
 
-            nb.add(new Node(n.p.add(0, -1, 0)));
-            nb.add(new Node(n.p.add(0, 1, 0)));
+                        if (Client.mc.theWorld.rayTraceBlocks(new Vec3(mp.getX(), mp.getY(), mp.getZ()), new Vec3(n.p.getX(), n.p.getY(), n.p.getZ())) != null) {
+                            continue;
+                        }
 
+                        if (Client.mc.theWorld.getBlockState(m.p).getBlock() != Blocks.air || (Client.mc.theWorld.getBlockState(m.p).getBlock() == Blocks.air && Client.mc.theWorld.getBlockState(m.p.add(0, -1, 0)).getBlock() == Blocks.air)) {
+                            continue;
+                        }
 
-            for (Node m : nb) {
-                if (Client.mc.theWorld.getBlockState(m.p).getBlock() != Blocks.air) {
-                    continue;
-                }
-
-                if (!isNotInCollection(new Node(m.p.add(0, 1, 0)), O)) {
-                    continue;
-                }
-
-                if (isNotInCollection(m, C)) {
-                    m.g = n.g + 1;
-                    m.f = m.g + m.p.distanceSq(t);
-                    m.parent = n;
-                    if (isNotInCollection(m, O)) {
+                        if (!contains(m, O) && !contains(m, C)) {
+                            m.g = s.distanceSq(m.p);
+                            m.parent = n;
                             O.add(m);
-                    } else {
-                        Node existingNode = getNodeFromCollection(m, O);
-                        assert existingNode != null;
-                        if (existingNode.f > m.f) {
-                            existingNode.parent = n;
-                            existingNode.g = m.g;
-                            existingNode.f = m.f;
+                        } else {
+                            m.g = n.p.distanceSq(m.p);
+                            if (m.f < m.g) {
+                                m.parent = n;
+                                if (contains(m, C)) {
+                                    C.remove(m);
+                                    O.add(m);
+                                }
+                            }
                         }
                     }
                 }
             }
+            O.remove(n);
+            C.add(n);
         }
+
         return null;
     }
 
-    private boolean isNotInCollection(Node node, Collection<Node> collection) {
+    private boolean contains(Node node, Collection<Node> collection) {
         for (Node n : collection) {
             if (n.p.equals(node.p)) {
-                return false;
+                return true;
             }
         }
-        return true;
-    }
-
-    private Node getNodeFromCollection(Node node, Collection<Node> collection) {
-        for (Node n : collection) {
-            if (n.p.equals(node.p)) {
-                return n;
-            }
-        }
-        return null;
+        return false;
     }
 }

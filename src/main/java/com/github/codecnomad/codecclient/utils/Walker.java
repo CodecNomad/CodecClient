@@ -1,8 +1,12 @@
 package com.github.codecnomad.codecclient.utils;
 
 import com.github.codecnomad.codecclient.Client;
+import com.github.codecnomad.codecclient.modules.FishingMacro;
 import com.github.codecnomad.codecclient.ui.Config;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.item.ItemFishingRod;
+import net.minecraft.item.ItemSpade;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -47,6 +51,18 @@ public class Walker {
         }
 
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), true);
+
+        if (wayPoints.get(currentPoint).getY() > Client.mc.thePlayer.posY + 2) {
+            for (int slotIndex = 0; slotIndex < 9; slotIndex++) {
+                ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
+                if (stack != null && stack.getItem() instanceof ItemSpade && stack.getDisplayName().contains("Aspect of the Void")) {
+                    Client.mc.thePlayer.inventory.currentItem = slotIndex;
+                    break;
+                }
+            }
+
+            KeyBinding.onTick(Client.mc.gameSettings.keyBindUseItem.getKeyCode());
+        }
 
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), java.lang.Math.abs(Client.mc.thePlayer.motionX) + java.lang.Math.abs(Client.mc.thePlayer.motionZ) < 0.05 && wayPoints.get(currentPoint).getY() > Client.mc.thePlayer.posY);
 
