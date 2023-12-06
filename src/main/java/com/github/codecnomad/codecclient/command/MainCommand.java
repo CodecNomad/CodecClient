@@ -24,7 +24,7 @@ public class MainCommand {
 
         @SubCommand
         public void add(int x, int y, int z) {
-                Collection<BlockPos> path = new Pathfinding().createPath(Client.mc.thePlayer.getPosition(), new BlockPos(x, y, z));
+                Collection<BlockPos> path = new Pathfinding().createPath(Client.mc.thePlayer.getPosition().add(0, -1, 0), new BlockPos(x, y - 1, z));
                 if (path != null) {
                         Chat.sendMessage(String.format("Added waypoint: %d", waypoints.size()));
                         waypoints.clear();

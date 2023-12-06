@@ -1,99 +1,111 @@
 package com.github.codecnomad.codecclient.utils;
 
 import com.github.codecnomad.codecclient.Client;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 class Node {
     public Node parent;
-    public double f;
+    public double h;
     public double g;
-    public BlockPos p;
+    public BlockPos pos;
 
-    public Node(BlockPos p, double f) {
-        this.p = p;
-        this.f = f;
+    public Node(BlockPos p) {
+        this.pos = p;
+    }
+
+    public double getF() {
+        return g + h;
     }
 }
 
 public class Pathfinding {
-    private final Collection<Node> O = new ArrayList<>();
-    private final Collection<Node> C = new ArrayList<>();
-
     public List<BlockPos> createPath(BlockPos s, BlockPos t) {
-        double l = s.distanceSq(t);
-        O.add(new Node(s, l));
+        final Set<Node> openSet = new HashSet<>();
+        final Set<Node> closedSet = new HashSet<>();
 
-        for (int i = 0; i < l*2 && !O.isEmpty(); i++) {
-            Node n = null;
-            double b = Double.MAX_VALUE;
-            for (Node n1 : O) {
-                if (n1.f < b) {
-                    n = n1;
-                    b = n1.f;
+        Node startNode = new Node(s);
+        startNode.g = 0;
+        startNode.h = s.distanceSq(t);
+        openSet.add(startNode);
+
+        for (int i = 0; !openSet.isEmpty() && i < s.distanceSq(t) * 2; i++) {
+            Node currentNode = null;
+            double lowestF = Double.MAX_VALUE;
+
+            for (Node node : openSet) {
+                double f = node.getF();
+                if (f < lowestF) {
+                    lowestF = f;
+                    currentNode = node;
                 }
             }
 
-            if (Objects.requireNonNull(n).p.equals(t)) {
-                List<BlockPos> p = new ArrayList<>();
-                while (n != null) {
-                    p.add(0, n.p);
-                    n = n.parent;
-                }
-
-                return p;
+            if (currentNode == null) {
+                return null;
             }
+
+            if (currentNode.pos.equals(t)) {
+                return reconstructPath(currentNode);
+            }
+
+            openSet.remove(currentNode);
+            closedSet.add(currentNode);
 
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
                     for (int y = -1; y <= 1; y++) {
-                        BlockPos mp = new BlockPos(n.p.add(x, y, z));
-                        Node m = new Node(mp, mp.distanceSq(t));
+                        BlockPos neighborPos = new BlockPos(currentNode.pos.add(x, y, z));
+                        Node neighbor = new Node(neighborPos);
 
-                        if (Client.mc.theWorld.rayTraceBlocks(new Vec3(mp.getX(), mp.getY(), mp.getZ()), new Vec3(n.p.getX(), n.p.getY(), n.p.getZ())) != null) {
+                        if (!Client.mc.theWorld.getBlockState(neighborPos).getBlock().isFullBlock()) {
                             continue;
                         }
 
-                        if (Client.mc.theWorld.getBlockState(m.p).getBlock() != Blocks.air || (Client.mc.theWorld.getBlockState(m.p).getBlock() == Blocks.air && Client.mc.theWorld.getBlockState(m.p.add(0, -1, 0)).getBlock() == Blocks.air)) {
+                        if (Client.mc.theWorld.rayTraceBlocks(new Vec3(currentNode.pos.getX(), currentNode.pos.getY() + 1, currentNode.pos.getZ()), new Vec3(neighborPos.getX(), neighborPos.getY() + 1, neighborPos.getZ())) != null) {
                             continue;
                         }
 
-                        if (!contains(m, O) && !contains(m, C)) {
-                            m.g = s.distanceSq(m.p);
-                            m.parent = n;
-                            O.add(m);
-                        } else {
-                            m.g = n.p.distanceSq(m.p);
-                            if (m.f < m.g) {
-                                m.parent = n;
-                                if (contains(m, C)) {
-                                    C.remove(m);
-                                    O.add(m);
-                                }
-                            }
+                        if (Client.mc.theWorld.getBlockState(neighborPos.add(0, 1, 0)).getBlock().isFullBlock()) {
+                            continue;
+                        }
+
+                        if (Client.mc.theWorld.getBlockState(neighborPos.add(0, 2, 0)).getBlock().isFullBlock()) {
+                            continue;
+                        }
+
+                        double tentativeGScore = currentNode.g + currentNode.pos.distanceSq(neighborPos);
+
+                        if (closedSet.contains(neighbor)) {
+                            continue;
+                        }
+
+                        if (!openSet.contains(neighbor) || tentativeGScore < neighbor.g) {
+                            neighbor.parent = currentNode;
+                            neighbor.g = tentativeGScore;
+                            neighbor.h = neighborPos.distanceSq(t);
+
+                            openSet.add(neighbor);
                         }
                     }
                 }
             }
-            O.remove(n);
-            C.add(n);
         }
 
         return null;
     }
 
-    private boolean contains(Node node, Collection<Node> collection) {
-        for (Node n : collection) {
-            if (n.p.equals(node.p)) {
-                return true;
-            }
+    private List<BlockPos> reconstructPath(Node currentNode) {
+        List<BlockPos> path = new ArrayList<>();
+        while (currentNode != null) {
+            path.add(0, currentNode.pos);
+            currentNode = currentNode.parent;
         }
-        return false;
+        return path;
     }
+
 }
