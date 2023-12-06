@@ -4,10 +4,15 @@ import cc.polyfrost.oneconfig.utils.commands.annotations.Command;
 import cc.polyfrost.oneconfig.utils.commands.annotations.Main;
 import cc.polyfrost.oneconfig.utils.commands.annotations.SubCommand;
 import com.github.codecnomad.codecclient.Client;
+import com.github.codecnomad.codecclient.ui.Config;
 import com.github.codecnomad.codecclient.utils.Chat;
 import com.github.codecnomad.codecclient.utils.Pathfinding;
+import com.github.codecnomad.codecclient.utils.Render;
 import com.github.codecnomad.codecclient.utils.Walker;
 import net.minecraft.util.BlockPos;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,9 +27,11 @@ public class MainCommand {
                 Client.guiConfig.openGui();
         }
 
+        Collection<BlockPos> path = new ArrayList<>();
         @SubCommand
         public void add(int x, int y, int z) {
-                Collection<BlockPos> path = new Pathfinding().createPath(Client.mc.thePlayer.getPosition().add(0, -1, 0), new BlockPos(x, y - 1, z));
+                MinecraftForge.EVENT_BUS.register(this);
+                path = new Pathfinding().createPath(Client.mc.thePlayer.getPosition().add(0, -1, 0), new BlockPos(x, y - 1, z));
                 if (path != null) {
                         Chat.sendMessage(String.format("Added waypoint: %d", waypoints.size()));
                         waypoints.clear();
@@ -32,6 +39,15 @@ public class MainCommand {
                 }
                 else {
                         Chat.sendMessage("Failed to find path..");
+                }
+        }
+
+        @SubscribeEvent
+        public void renderWorld(RenderWorldLastEvent event) {
+                if (path != null) {
+                        for (BlockPos pos : path) {
+                                Render.drawOutlinedFilledBoundingBox(pos.add(0, 1, 0), Config.VisualColor.toJavaColor(), event.partialTicks);
+                        }
                 }
         }
 

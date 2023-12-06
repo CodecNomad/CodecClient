@@ -1,12 +1,12 @@
 package com.github.codecnomad.codecclient.utils;
 
 import com.github.codecnomad.codecclient.Client;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 class Node {
     public Node parent;
@@ -59,22 +59,26 @@ public class Pathfinding {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
                     for (int y = -1; y <= 1; y++) {
+                        if (x == 0 && y == 0 && z == 0) {
+                            continue;
+                        }
+
+                        if (x != 0 && z != 0) {
+                            continue;
+                        }
+
                         BlockPos neighborPos = new BlockPos(currentNode.pos.add(x, y, z));
                         Node neighbor = new Node(neighborPos);
 
-                        if (!Client.mc.theWorld.getBlockState(neighborPos).getBlock().isFullBlock()) {
+                        if (!Client.mc.theWorld.getBlockState(neighborPos).getBlock().getMaterial().blocksMovement()) {
                             continue;
                         }
 
-                        if (Client.mc.theWorld.rayTraceBlocks(new Vec3(currentNode.pos.getX(), currentNode.pos.getY() + 1, currentNode.pos.getZ()), new Vec3(neighborPos.getX(), neighborPos.getY() + 1, neighborPos.getZ())) != null) {
+                        if (Client.mc.theWorld.getBlockState(neighborPos.add(0, 1, 0)).getBlock().getMaterial().blocksMovement()) {
                             continue;
                         }
 
-                        if (Client.mc.theWorld.getBlockState(neighborPos.add(0, 1, 0)).getBlock().isFullBlock()) {
-                            continue;
-                        }
-
-                        if (Client.mc.theWorld.getBlockState(neighborPos.add(0, 2, 0)).getBlock().isFullBlock()) {
+                        if (Client.mc.theWorld.getBlockState(neighborPos.add(0, 2, 0)).getBlock().getMaterial().blocksMovement()) {
                             continue;
                         }
 
@@ -107,5 +111,4 @@ public class Pathfinding {
         }
         return path;
     }
-
 }

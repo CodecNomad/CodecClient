@@ -7,7 +7,6 @@ import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -67,15 +66,6 @@ public class Walker {
 
         if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 2) {
             currentPoint++;
-        }
-    }
-
-    @SubscribeEvent
-    public void renderWorld(RenderWorldLastEvent event) {
-        if (currentPoint < wayPoints.size()) {
-            BlockPos waypoint = wayPoints.get(currentPoint);
-            Render.drawOutlinedFilledBoundingBox(waypoint.add(0, 1, 0), Config.VisualColor.toJavaColor(), event.partialTicks);
-            Render.draw3DString(new Vec3(waypoint.getX(), waypoint.getY() + 1, waypoint.getZ()), String.format("Waypoint: %s", currentPoint), 0, event.partialTicks);
         }
     }
 
