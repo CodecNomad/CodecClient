@@ -1,8 +1,8 @@
 package com.github.codecnomad.codecclient.utils;
 
 import com.github.codecnomad.codecclient.Client;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 
 import java.util.ArrayList;
@@ -75,8 +75,7 @@ public class Pathfinding {
                         BlockPos neighborPos = new BlockPos(currentNode.pos.add(x, y, z));
                         Node neighbor = new Node(neighborPos);
 
-                        if (isAllowed(Client.mc.theWorld.getBlockState(neighborPos).getBlock()) || !isAllowed(Client.mc.theWorld.getBlockState(neighborPos.add(0, 1, 0)).getBlock()) || !isAllowed(Client.mc.theWorld.getBlockState(neighborPos.add(0, 2, 0)).getBlock())) {
-                            closedSet.add(neighbor);
+                        if (canWalkTrough(neighborPos)) {
                             continue;
                         }
 
@@ -101,54 +100,14 @@ public class Pathfinding {
         return null;
     }
 
-    private boolean isAllowed(Block block) {
-        final List<Class<? extends Block>> allowedBlocks = new ArrayList<>();
-
-        allowedBlocks.add(Blocks.air.getClass());
-        allowedBlocks.add(Blocks.skull.getClass());
-        allowedBlocks.add(Blocks.nether_wart.getClass());
-        allowedBlocks.add(Blocks.wheat.getClass());
-        allowedBlocks.add(Blocks.carrots.getClass());
-        allowedBlocks.add(Blocks.water.getClass());
-        allowedBlocks.add(Blocks.tallgrass.getClass());
-        allowedBlocks.add(Blocks.double_plant.getClass());
-        allowedBlocks.add(Blocks.yellow_flower.getClass());
-        allowedBlocks.add(Blocks.red_flower.getClass());
-        allowedBlocks.add(Blocks.vine.getClass());
-        allowedBlocks.add(Blocks.redstone_wire.getClass());
-        allowedBlocks.add(Blocks.snow_layer.getClass());
-        allowedBlocks.add(Blocks.torch.getClass());
-        allowedBlocks.add(Blocks.cocoa.getClass());
-        allowedBlocks.add(Blocks.end_portal.getClass());
-        allowedBlocks.add(Blocks.tripwire.getClass());
-        allowedBlocks.add(Blocks.web.getClass());
-        allowedBlocks.add(Blocks.flower_pot.getClass());
-        allowedBlocks.add(Blocks.wooden_pressure_plate.getClass());
-        allowedBlocks.add(Blocks.stone_pressure_plate.getClass());
-        allowedBlocks.add(Blocks.redstone_torch.getClass());
-        allowedBlocks.add(Blocks.lever.getClass());
-        allowedBlocks.add(Blocks.stone_button.getClass());
-        allowedBlocks.add(Blocks.wooden_button.getClass());
-        allowedBlocks.add(Blocks.carpet.getClass());
-        allowedBlocks.add(Blocks.standing_sign.getClass());
-        allowedBlocks.add(Blocks.wall_sign.getClass());
-        allowedBlocks.add(Blocks.rail.getClass());
-        allowedBlocks.add(Blocks.detector_rail.getClass());
-        allowedBlocks.add(Blocks.activator_rail.getClass());
-        allowedBlocks.add(Blocks.golden_rail.getClass());
-        allowedBlocks.add(Blocks.stone_stairs.getClass());
-        allowedBlocks.add(Blocks.brick_stairs.getClass());
-        allowedBlocks.add(Blocks.stone_slab.getClass());
-        allowedBlocks.add(Blocks.jungle_stairs.getClass());
-        allowedBlocks.add(Blocks.wooden_slab.getClass());
-        allowedBlocks.add(Blocks.wooden_slab.getClass());
-
-        for (Class<? extends Block> allowedBlockClass : allowedBlocks) {
-            if (allowedBlockClass.isInstance(block)) {
-                return true;
-            }
+    private boolean canWalkTrough(BlockPos pos) {
+        IBlockState blockState = Client.mc.theWorld.getBlockState(pos);
+        AxisAlignedBB blockAABB = blockState.getBlock().getCollisionBoundingBox(Client.mc.theWorld, pos, blockState);
+        if (blockAABB == null) {
+            return true;
         }
-        return false;
+
+        return blockAABB.maxY - blockAABB.minY < 0.625;
     }
 
 
