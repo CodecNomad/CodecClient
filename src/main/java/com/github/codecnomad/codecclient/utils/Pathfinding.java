@@ -23,6 +23,12 @@ class Node {
     public double getF() {
         return g + h;
     }
+
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    @Override
+    public boolean equals(Object other) {
+        return this.pos.equals(((Node) other).pos);
+    }
 }
 
 public class Pathfinding {
@@ -97,8 +103,6 @@ public class Pathfinding {
 
     private boolean isAllowed(Block block) {
         final List<Class<? extends Block>> allowedBlocks = new ArrayList<>();
-
-        allowedBlocks.add(Blocks.grass.getClass());
 
         allowedBlocks.add(Blocks.air.getClass());
         allowedBlocks.add(Blocks.skull.getClass());
