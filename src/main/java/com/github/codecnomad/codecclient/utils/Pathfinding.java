@@ -42,7 +42,7 @@ public class Pathfinding {
         open.add(start);
 
         long startTime = System.currentTimeMillis();
-        while (!open.isEmpty() && (System.currentTimeMillis() - startTime) < 1000) {
+        while (!open.isEmpty() && (System.currentTimeMillis() - startTime) < 5000) {
             Node currentNode = null;
             double lowestF = Double.POSITIVE_INFINITY;
 
@@ -72,6 +72,10 @@ public class Pathfinding {
                     continue;
                 }
 
+                if (neighbourNode.getBlockState() == null) {
+                    return reconstructPath(currentNode);
+                }
+
                 if (!neighbourNode.getBlockMaterial().blocksMovement()) {
                     continue;
                 }
@@ -79,25 +83,20 @@ public class Pathfinding {
                 Node node1 = new Node(neighbourNode.position.add(0, 1, 0));
                 Node node2 = new Node(neighbourNode.position.add(0, 2, 0));
                 Node node3 = new Node(neighbourNode.position.add(0, 3, 0));
-                Node node4 = new Node(neighbourNode.position.add(0, 4, 0));
 
                 AxisAlignedBB node1BB = null;
                 AxisAlignedBB node2BB = null;
                 AxisAlignedBB node3BB = null;
-                AxisAlignedBB node4BB = null;
 
                 try {
                     node1BB = node1.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node1.getBlockState());
-                } catch (Exception ignored) {};
+                } catch (Exception ignored) {}
                 try {
                     node2BB = node2.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node2.getBlockState());
-                } catch (Exception ignored) {};
+                } catch (Exception ignored) {}
                 try {
                     node3BB = node3.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node3.getBlockState());
-                } catch (Exception ignored) {};
-                try {
-                    node4BB = node4.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node4.getBlockState());
-                } catch (Exception ignored) {};
+                } catch (Exception ignored) {}
 
                 double allBB = 0;
                 if (node1BB != null) {
@@ -110,10 +109,6 @@ public class Pathfinding {
 
                 if (node3BB != null) {
                     allBB += (node3BB.maxY - node3BB.minY);
-                }
-
-                if (node4BB != null) {
-                    allBB += (node4BB.maxY - node4BB.minY);
                 }
 
                 if (allBB > 0.2) {
@@ -176,10 +171,6 @@ public class Pathfinding {
             neighbourPositions.add(this.position.add(0, 1, 1));
             neighbourPositions.add(this.position.add(0, 1, -1));
 
-            neighbourPositions.add(this.position.add(1, 2, 0));
-            neighbourPositions.add(this.position.add(-1, 2, 0));
-            neighbourPositions.add(this.position.add(0, 2, 1));
-            neighbourPositions.add(this.position.add(0, 2, -1));
             return neighbourPositions;
         }
 

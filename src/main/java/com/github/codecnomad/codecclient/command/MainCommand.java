@@ -38,8 +38,7 @@ public class MainCommand {
                         Chat.sendMessage(String.format("Added waypoint: %d", waypoints.size()));
                         waypoints.clear();
                         waypoints.addAll(path);
-                }
-                else {
+                } else {
                         Chat.sendMessage("Failed to find path..");
                 }
         }

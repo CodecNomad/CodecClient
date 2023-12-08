@@ -37,17 +37,9 @@ public class Walker {
             return;
         }
 
-        for (int i = currentPoint; i < wayPoints.size(); i++) {
-            BlockPos iPos = wayPoints.get(i);
-            BlockPos pPos = Client.mc.thePlayer.getPosition();
-            if (Client.mc.theWorld.rayTraceBlocks(new Vec3(iPos.getX(), iPos.getY() + 1, iPos.getZ()), new Vec3(pPos.getX(), pPos.getY() + 1, pPos.getZ())) == null && iPos.getY() != pPos.getY()) {
-                currentPoint = i;
-            }
-        }
-
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), true);
 
-        if (wayPoints.get(currentPoint).getY() + 1 > Client.mc.thePlayer.posY + 3) {
+        if (wayPoints.get(currentPoint).getY() + 1 > Client.mc.thePlayer.posY + 2) {
             for (int slotIndex = 0; slotIndex < 9; slotIndex++) {
                 ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
                 if (stack != null && stack.getItem() instanceof ItemSpade && stack.getDisplayName().contains("Aspect of the Void")) {
