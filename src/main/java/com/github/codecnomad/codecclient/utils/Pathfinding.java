@@ -10,8 +10,10 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Pathfinding {
     Set<Node> open = new HashSet<>();
@@ -20,10 +22,15 @@ public class Pathfinding {
     @SubscribeEvent
     public void lastWorld(RenderWorldLastEvent event) {
         for (Node node : open) {
-            Render.drawOutlinedFilledBoundingBox(node.position, Color.gray, event.partialTicks);
+            Render.drawOutlinedFilledBoundingBox(node.position, Color.green, event.partialTicks);
+        }
+
+        for (Node node : closed) {
+            Render.drawOutlinedFilledBoundingBox(node.position, Color.red, event.partialTicks);
         }
     }
 
+    @SuppressWarnings("EmptyFinallyBlock")
     public List<BlockPos> createPath(BlockPos s, BlockPos t) {
         open.clear();
         closed.clear();
@@ -74,25 +81,44 @@ public class Pathfinding {
                 Node node1 = new Node(neighbourNode.position.add(0, 1, 0));
                 Node node2 = new Node(neighbourNode.position.add(0, 2, 0));
                 Node node3 = new Node(neighbourNode.position.add(0, 3, 0));
+                Node node4 = new Node(neighbourNode.position.add(0, 4, 0));
 
-                AxisAlignedBB node1BB = node1.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node1.getBlockState());
-                AxisAlignedBB node2BB = node2.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node2.getBlockState());
-                AxisAlignedBB node3BB = node3.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node3.getBlockState());
+                AxisAlignedBB node1BB;
+                AxisAlignedBB node2BB;
+                AxisAlignedBB node3BB;
+                AxisAlignedBB node4BB;
+
+                try {
+                    node1BB = node1.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node1.getBlockState());
+                } finally {}
+                try {
+                    node2BB = node2.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node2.getBlockState());
+                } finally {}
+                try {
+                    node3BB = node3.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node3.getBlockState());
+                } finally {}
+                try {
+                    node4BB = node4.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node4.getBlockState());
+                } finally {}
 
                 double allBB = 0;
                 if (node1BB != null) {
-                    allBB += (node1BB.maxX - node1BB.maxY);
+                    allBB += (node1BB.maxY - node1BB.minY);
                 }
 
                 if (node2BB != null) {
-                    allBB += (node2BB.maxX - node2BB.maxY);
+                    allBB += (node2BB.maxY - node2BB.minY);
                 }
 
                 if (node3BB != null) {
-                    allBB += (node3BB.maxX - node3BB.maxY);
+                    allBB += (node3BB.maxY - node3BB.minY);
                 }
 
-                if (allBB > 1) {
+                if (node4BB != null) {
+                    allBB += (node4BB.maxY - node4BB.minY);
+                }
+
+                if (allBB > 0.4) {
                     continue;
                 }
 
@@ -100,8 +126,8 @@ public class Pathfinding {
                         new Vec3(currentNode.position.getX(), currentNode.position.getY() + 1, currentNode.position.getZ()),
                         new Vec3(neighbourNode.position.getX(), neighbourNode.position.getY() + 1, neighbourNode.position.getZ())) != null ||
                         Client.mc.theWorld.rayTraceBlocks(
-                        new Vec3(currentNode.position.getX(), currentNode.position.getY() + 2, currentNode.position.getZ()),
-                        new Vec3(neighbourNode.position.getX(), neighbourNode.position.getY() + 2, neighbourNode.position.getZ())) != null ||
+                                new Vec3(currentNode.position.getX(), currentNode.position.getY() + 2, currentNode.position.getZ()),
+                                new Vec3(neighbourNode.position.getX(), neighbourNode.position.getY() + 2, neighbourNode.position.getZ())) != null ||
                         Client.mc.theWorld.rayTraceBlocks(
                                 new Vec3(currentNode.position.getX(), currentNode.position.getY() + 3, currentNode.position.getZ()),
                                 new Vec3(neighbourNode.position.getX(), neighbourNode.position.getY() + 3, neighbourNode.position.getZ())) != null

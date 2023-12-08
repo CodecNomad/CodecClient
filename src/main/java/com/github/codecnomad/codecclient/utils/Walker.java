@@ -40,7 +40,7 @@ public class Walker {
         for (int i = currentPoint; i < wayPoints.size(); i++) {
             BlockPos iPos = wayPoints.get(i);
             BlockPos pPos = Client.mc.thePlayer.getPosition();
-            if (Client.mc.theWorld.rayTraceBlocks(new Vec3(iPos.getX(), iPos.getY() + 1, iPos.getZ()), new Vec3(pPos.getX(), pPos.getY() + 1, pPos.getZ())) == null) {
+            if (Client.mc.theWorld.rayTraceBlocks(new Vec3(iPos.getX(), iPos.getY() + 1, iPos.getZ()), new Vec3(pPos.getX(), pPos.getY() + 1, pPos.getZ())) == null && iPos.getY() != pPos.getY()) {
                 currentPoint = i;
             }
         }
