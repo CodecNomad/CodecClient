@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 @SuppressWarnings("unused")
-@Command(value = "codecclient", aliases = {"codec"})
+@Command(value = "codecclient", aliases = {"cc"})
 public class MainCommand {
         List<BlockPos> waypoints = new ArrayList<>();
         @Main
@@ -38,7 +38,7 @@ public class MainCommand {
                         waypoints.addAll(path);
                 }
                 else {
-                        Chat.sendMessage("Failed to find path..");
+                        Chat.sendMessage("Failed to find path.");
                 }
         }
 
