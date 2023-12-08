@@ -5,7 +5,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -30,7 +29,6 @@ public class Pathfinding {
         }
     }
 
-    @SuppressWarnings("EmptyFinallyBlock")
     public List<BlockPos> createPath(BlockPos s, BlockPos t) {
         open.clear();
         closed.clear();
@@ -44,7 +42,7 @@ public class Pathfinding {
         open.add(start);
 
         long startTime = System.currentTimeMillis();
-        while (!open.isEmpty() && (System.currentTimeMillis() - startTime) < 100) {
+        while (!open.isEmpty() && (System.currentTimeMillis() - startTime) < 1000) {
             Node currentNode = null;
             double lowestF = Double.POSITIVE_INFINITY;
 
@@ -83,23 +81,23 @@ public class Pathfinding {
                 Node node3 = new Node(neighbourNode.position.add(0, 3, 0));
                 Node node4 = new Node(neighbourNode.position.add(0, 4, 0));
 
-                AxisAlignedBB node1BB;
-                AxisAlignedBB node2BB;
-                AxisAlignedBB node3BB;
-                AxisAlignedBB node4BB;
+                AxisAlignedBB node1BB = null;
+                AxisAlignedBB node2BB = null;
+                AxisAlignedBB node3BB = null;
+                AxisAlignedBB node4BB = null;
 
                 try {
                     node1BB = node1.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node1.getBlockState());
-                } finally {}
+                } catch (Exception ignored) {};
                 try {
                     node2BB = node2.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node2.getBlockState());
-                } finally {}
+                } catch (Exception ignored) {};
                 try {
                     node3BB = node3.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node3.getBlockState());
-                } finally {}
+                } catch (Exception ignored) {};
                 try {
                     node4BB = node4.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node4.getBlockState());
-                } finally {}
+                } catch (Exception ignored) {};
 
                 double allBB = 0;
                 if (node1BB != null) {
@@ -118,20 +116,7 @@ public class Pathfinding {
                     allBB += (node4BB.maxY - node4BB.minY);
                 }
 
-                if (allBB > 0.4) {
-                    continue;
-                }
-
-                if (Client.mc.theWorld.rayTraceBlocks(
-                        new Vec3(currentNode.position.getX(), currentNode.position.getY() + 1, currentNode.position.getZ()),
-                        new Vec3(neighbourNode.position.getX(), neighbourNode.position.getY() + 1, neighbourNode.position.getZ())) != null ||
-                        Client.mc.theWorld.rayTraceBlocks(
-                                new Vec3(currentNode.position.getX(), currentNode.position.getY() + 2, currentNode.position.getZ()),
-                                new Vec3(neighbourNode.position.getX(), neighbourNode.position.getY() + 2, neighbourNode.position.getZ())) != null ||
-                        Client.mc.theWorld.rayTraceBlocks(
-                                new Vec3(currentNode.position.getX(), currentNode.position.getY() + 3, currentNode.position.getZ()),
-                                new Vec3(neighbourNode.position.getX(), neighbourNode.position.getY() + 3, neighbourNode.position.getZ())) != null
-                ) {
+                if (allBB > 0.2) {
                     continue;
                 }
 
@@ -175,14 +160,26 @@ public class Pathfinding {
         List<BlockPos> getNeighbourPositions() {
             List<BlockPos> neighbourPositions = new ArrayList<>();
 
-            for (int x = -1; x <= 1; x++) {
-                for (int y = -1; y <= 1; y++) {
-                    for (int z = -1; z <= 1; z++) {
-                        neighbourPositions.add(this.position.add(x, y, z));
-                    }
-                }
-            }
+            neighbourPositions.add(this.position.add(1, 0, 0));
+            neighbourPositions.add(this.position.add(-1, 0, 0));
+            neighbourPositions.add(this.position.add(0, 0, 1));
+            neighbourPositions.add(this.position.add(0, 0, -1));
 
+            neighbourPositions.add(this.position.add(1, -1, 0));
+            neighbourPositions.add(this.position.add(-1, -1, 0));
+            neighbourPositions.add(this.position.add(0, -1, 1));
+            neighbourPositions.add(this.position.add(0, -1, -1));
+
+
+            neighbourPositions.add(this.position.add(1, 1, 0));
+            neighbourPositions.add(this.position.add(-1, 1, 0));
+            neighbourPositions.add(this.position.add(0, 1, 1));
+            neighbourPositions.add(this.position.add(0, 1, -1));
+
+            neighbourPositions.add(this.position.add(1, 2, 0));
+            neighbourPositions.add(this.position.add(-1, 2, 0));
+            neighbourPositions.add(this.position.add(0, 2, 1));
+            neighbourPositions.add(this.position.add(0, 2, -1));
             return neighbourPositions;
         }
 
