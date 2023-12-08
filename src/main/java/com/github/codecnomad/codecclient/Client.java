@@ -34,6 +34,8 @@ public class Client {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(rotation);
 
+        MinecraftForge.EVENT_BUS.register(MainCommand.pathfinding);
+
         CommandManager.register(new MainCommand());
     }
 

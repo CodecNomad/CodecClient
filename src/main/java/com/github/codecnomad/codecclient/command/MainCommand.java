@@ -28,10 +28,12 @@ public class MainCommand {
         }
 
         Collection<BlockPos> path = new ArrayList<>();
+        public static Pathfinding pathfinding = new Pathfinding();
+
         @SubCommand
         public void add(int x, int y, int z) {
                 MinecraftForge.EVENT_BUS.register(this);
-                path = new Pathfinding().createPath(Client.mc.thePlayer.getPosition().add(0, -1, 0), new BlockPos(x, y - 1, z));
+                path = pathfinding.createPath(Client.mc.thePlayer.getPosition().add(0, -1, 0), new BlockPos(x, y - 1, z));
                 if (path != null) {
                         Chat.sendMessage(String.format("Added waypoint: %d", waypoints.size()));
                         waypoints.clear();
