@@ -3,6 +3,7 @@ package com.github.codecnomad.codecclient.utils;
 import com.github.codecnomad.codecclient.Client;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -35,8 +36,7 @@ public class Walker {
             return;
         }
 
-        float yawDifference = Math.getYaw(wayPoints.get(currentPoint)) - Client.mc.thePlayer.cameraYaw;
-        Chat.sendMessage(String.valueOf(yawDifference));
+        float yawDifference = Math.getYaw(wayPoints.get(currentPoint)) - MathHelper.wrapAngleTo180_float(Client.mc.thePlayer.rotationYaw);
 
         if (yawDifference > -45 && yawDifference <= 45) {
             movementHelper(true, false, false, false);
@@ -53,7 +53,6 @@ public class Walker {
         if (yawDifference > -180 && yawDifference <= -135 || yawDifference > 135 && yawDifference <= 180) {
             movementHelper(false, false, false, true);
         }
-
 
         if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 1) {
             currentPoint++;
