@@ -16,9 +16,6 @@ public class Walker {
 
     public void start() {
         MinecraftForge.EVENT_BUS.register(this);
-        if (Client.mc.thePlayer.capabilities.getWalkSpeed() * 1000 > 200) {
-            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindSneak.getKeyCode(), true);
-        }
     }
 
     public void stop() {
@@ -28,7 +25,6 @@ public class Walker {
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindRight.getKeyCode(), false);
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindLeft.getKeyCode(), false);
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), false);
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindSneak.getKeyCode(), false);
         callback.run();
     }
 
