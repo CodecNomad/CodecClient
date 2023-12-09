@@ -1,12 +1,8 @@
 package com.github.codecnomad.codecclient.utils;
 
 import com.github.codecnomad.codecclient.Client;
-import com.github.codecnomad.codecclient.ui.Config;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.item.ItemSpade;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -20,13 +16,19 @@ public class Walker {
 
     public void start() {
         MinecraftForge.EVENT_BUS.register(this);
+        if (Client.mc.thePlayer.capabilities.getWalkSpeed() * 1000 > 200) {
+            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindSneak.getKeyCode(), true);
+        }
     }
 
     public void stop() {
         currentPoint = 0;
         MinecraftForge.EVENT_BUS.unregister(this);
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), false);
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), false);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindRight.getKeyCode(), false);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindLeft.getKeyCode(), false);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), false);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindSneak.getKeyCode(), false);
         callback.run();
     }
 
@@ -37,28 +39,36 @@ public class Walker {
             return;
         }
 
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), true);
+        float yawDifference = Math.getYaw(wayPoints.get(currentPoint)) - Client.mc.thePlayer.cameraYaw;
+        Chat.sendMessage(String.valueOf(yawDifference));
 
-        if (wayPoints.get(currentPoint).getY() + 1 > Client.mc.thePlayer.posY + 2) {
-            for (int slotIndex = 0; slotIndex < 9; slotIndex++) {
-                ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
-                if (stack != null && stack.getItem() instanceof ItemSpade && stack.getDisplayName().contains("Aspect of the Void")) {
-                    Client.mc.thePlayer.inventory.currentItem = slotIndex;
-                    break;
-                }
-            }
-
-            KeyBinding.onTick(Client.mc.gameSettings.keyBindUseItem.getKeyCode());
+        if (yawDifference > -45 && yawDifference <= 45) {
+            movementHelper(true, false, false, false);
         }
 
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), java.lang.Math.abs(Client.mc.thePlayer.motionX) + java.lang.Math.abs(Client.mc.thePlayer.motionZ) < 0.1);
+        if (yawDifference > -135 && yawDifference <= -45) {
+            movementHelper(false, true, false, false);
+        }
 
-        Client.rotation.setYaw(Math.getYaw(wayPoints.get(currentPoint).add(0, 1, 0)), Config.RotationSmoothing);
-        Client.rotation.setPitch(Math.getPitch(wayPoints.get(currentPoint).add(0, 1, 0)), Config.RotationSmoothing);
+        if (yawDifference > 45 && yawDifference <= 135) {
+            movementHelper(false, false, true, false);
+        }
 
-        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 2) {
+        if (yawDifference > -180 && yawDifference <= -135 || yawDifference > 135 && yawDifference <= 180) {
+            movementHelper(false, false, false, true);
+        }
+
+
+        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 1) {
             currentPoint++;
         }
+    }
+
+    public void movementHelper(boolean f, boolean l, boolean r, boolean b) {
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), f);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindLeft.getKeyCode(), l);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindRight.getKeyCode(), r);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), b);
     }
 
     public Walker(List<BlockPos> wayPoints, Runnable callback) {

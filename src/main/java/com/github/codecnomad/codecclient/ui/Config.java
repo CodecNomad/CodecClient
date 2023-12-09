@@ -104,8 +104,10 @@ public class Config extends cc.polyfrost.oneconfig.config.Config {
 
     public Config() {
         super(new Mod("CodecClient", ModType.UTIL_QOL), "config.json");
-        this.registerKeyBind(FishingKeybinding, () -> toggle("FishingMacro"));
         initialize();
+
+        registerKeyBind(FishingKeybinding, () -> toggle("FishingMacro"));
+        save();
     }
 
     private static void toggle(String name) {
