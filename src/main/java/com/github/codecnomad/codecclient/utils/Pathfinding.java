@@ -5,6 +5,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -115,11 +116,11 @@ public class Pathfinding {
                     continue;
                 }
 
-                double tentativeGCost = currentNode.gCost + currentNode.distanceTo(neighbourNode);
+                double gCost = currentNode.distanceTo(neighbourNode);
 
-                if (!neighbourNode.isIn(open) || tentativeGCost < neighbourNode.gCost) {
+                if (!neighbourNode.isIn(open) || gCost < neighbourNode.gCost) {
                     neighbourNode.parent = currentNode;
-                    neighbourNode.gCost = tentativeGCost;
+                    neighbourNode.gCost = gCost;
                     neighbourNode.hCost = neighbourNode.distanceTo(target);
 
                     open.add(neighbourNode);
