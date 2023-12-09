@@ -194,19 +194,7 @@ public class FishingMacro extends Module {
                     return;
                 }
 
-                for (int slotIndex = 0; slotIndex < 9; slotIndex++) {
-                    ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
-                    if (stack != null &&
-                            (
-                                    stack.getItem() instanceof ItemSpade ||
-                                            stack.getItem() instanceof ItemSword ||
-                                            stack.getItem() instanceof ItemAxe
-                            )
-                    ) {
-                        Client.mc.thePlayer.inventory.currentItem = slotIndex;
-                        break;
-                    }
-                }
+                Client.mc.thePlayer.inventory.currentItem = Config.WeaponSlot - 1;
 
                 AxisAlignedBB boundingBox = fishingMonster.getEntityBoundingBox();
                 double deltaX = boundingBox.maxX - boundingBox.minX;
@@ -219,6 +207,10 @@ public class FishingMacro extends Module {
 
                 if (!MainCounter.countUntil(20 / Config.AttackCps)) {
                     MainCounter.add(java.lang.Math.random() * 100 > 70 ? 1 : 0);
+                    if (Config.RightClick) {
+                        KeyBinding.onTick(Client.mc.gameSettings.keyBindUseItem.getKeyCode());
+                        return;
+                    }
                     KeyBinding.onTick(Client.mc.gameSettings.keyBindAttack.getKeyCode());
                 }
             }

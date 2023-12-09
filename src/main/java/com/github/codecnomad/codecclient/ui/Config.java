@@ -80,6 +80,22 @@ public class Config extends cc.polyfrost.oneconfig.config.Config {
     )
     public static boolean OnlySound = false;
 
+    @Number(
+            name = "Weapon slot",
+            category = "Macros",
+            subcategory = "Fishing",
+            min = 1,
+            max = 9
+    )
+    public static int WeaponSlot = 9;
+
+    @Switch(
+            name = "Right click attack",
+            category = "Macros",
+            subcategory = "Fishing"
+    )
+    public static boolean RightClick = false;
+
     @HUD(
             name = "Fishing HUD",
             category = "Visuals"
