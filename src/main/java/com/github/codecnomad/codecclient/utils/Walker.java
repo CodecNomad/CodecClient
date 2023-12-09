@@ -38,6 +38,8 @@ public class Walker {
 
         float yawDifference = Math.getYaw(wayPoints.get(currentPoint)) - MathHelper.wrapAngleTo180_float(Client.mc.thePlayer.rotationYaw);
 
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), wayPoints.get(currentPoint).getY() + 1 > Client.mc.thePlayer.posY);
+
         if (yawDifference > -45 && yawDifference <= 45) {
             movementHelper(true, false, false, false);
         }
