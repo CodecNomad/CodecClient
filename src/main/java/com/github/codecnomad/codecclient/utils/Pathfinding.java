@@ -185,13 +185,9 @@ public class Pathfinding {
         }
 
         boolean isIn(Set<Node> set) {
-            for (Node node : set) {
-                if (node.position.equals(this.position)) {
-                    return true;
-                }
-            }
-            return false;
+            return set.stream().anyMatch(node -> node.position.equals(this.position));
         }
+
 
         IBlockState getBlockState() {
             return Client.mc.theWorld.getBlockState(this.position);
