@@ -68,10 +68,6 @@ public class Pathfinding {
             for (BlockPos neighbourPosition : currentNode.getNeighbourPositions()) {
                 Node neighbourNode = new Node(neighbourPosition);
 
-                if (neighbourNode.isIn(closed)) {
-                    continue;
-                }
-
                 if (neighbourNode.getBlockState() == null) {
                     return reconstructPath(currentNode);
                 }
@@ -80,22 +76,30 @@ public class Pathfinding {
                     continue;
                 }
 
+                if (neighbourNode.isIn(closed)) {
+                    continue;
+                }
+
                 Node node1 = new Node(neighbourNode.position.add(0, 1, 0));
                 Node node2 = new Node(neighbourNode.position.add(0, 2, 0));
                 Node node3 = new Node(neighbourNode.position.add(0, 3, 0));
+
+                IBlockState node1BS = node1.getBlockState();
+                IBlockState node2BS = node2.getBlockState();
+                IBlockState node3BS = node3.getBlockState();
 
                 AxisAlignedBB node1BB = null;
                 AxisAlignedBB node2BB = null;
                 AxisAlignedBB node3BB = null;
 
                 try {
-                    node1BB = node1.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node1.getBlockState());
+                    node1BB = node1BS.getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node1BS);
                 } catch (Exception ignored) {}
                 try {
-                    node2BB = node2.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node2.getBlockState());
+                    node2BB = node2BS.getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node2BS);
                 } catch (Exception ignored) {}
                 try {
-                    node3BB = node3.getBlockState().getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node3.getBlockState());
+                    node3BB = node3BS.getBlock().getCollisionBoundingBox(Client.mc.theWorld, node1.position, node3BS);
                 } catch (Exception ignored) {}
 
                 double allBB = 0;
