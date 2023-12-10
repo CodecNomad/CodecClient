@@ -4,6 +4,7 @@ import com.github.codecnomad.codecclient.Client;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -38,34 +39,32 @@ public class Walker {
 
         float yawDifference = Math.getYaw(wayPoints.get(currentPoint)) - MathHelper.wrapAngleTo180_float(Client.mc.thePlayer.rotationYaw);
 
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), false);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindLeft.getKeyCode(), false);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindRight.getKeyCode(), false);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), false);
+
+        if (yawDifference > -67.5 && yawDifference <= 67.5) {
+            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), true);
+        }
+
+        if (yawDifference > -157.5 && yawDifference <= -22.5) {
+            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindLeft.getKeyCode(), true);
+        }
+
+        if (yawDifference > 22.5 && yawDifference <= 157.5) {
+            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindRight.getKeyCode(), true);
+        }
+
+        if ((yawDifference > -180 && yawDifference <= -157.5) || (yawDifference > 157.5 && yawDifference <= 180)) {
+            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), true);
+        }
+
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), wayPoints.get(currentPoint).getY() + 1 > Client.mc.thePlayer.posY);
 
-        if (yawDifference > -45 && yawDifference <= 45) {
-            movementHelper(true, false, false, false);
-        }
-
-        if (yawDifference > -135 && yawDifference <= -45) {
-            movementHelper(false, true, false, false);
-        }
-
-        if (yawDifference > 45 && yawDifference <= 135) {
-            movementHelper(false, false, true, false);
-        }
-
-        if (yawDifference > -180 && yawDifference <= -135 || yawDifference > 135 && yawDifference <= 180) {
-            movementHelper(false, false, false, true);
-        }
-
-        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 1) {
+        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 5) {
             currentPoint++;
         }
-    }
-
-    public void movementHelper(boolean f, boolean l, boolean r, boolean b) {
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), f);
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindLeft.getKeyCode(), l);
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindRight.getKeyCode(), r);
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), b);
     }
 
     public Walker(List<BlockPos> wayPoints, Runnable callback) {
