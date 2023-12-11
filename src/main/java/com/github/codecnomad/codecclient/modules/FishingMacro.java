@@ -58,12 +58,19 @@ public class FishingMacro extends Module {
         lastPitch = Client.mc.thePlayer.rotationPitch;
         startTime = (int) java.lang.Math.floor((double) System.currentTimeMillis() / 1000);
         try {
-            FileReader reader = new FileReader("fishingHUD.json");
-            JSONObject data = new JSONObject(reader.read());
-            startTime = (int)data.get("startTime")/*data.getInt("startTime")*/;
-            totalTime = (int)data.get("totalTime")/*data.getInt("totalTime")*/;
-            catches = (int)data.get("catches")/*data.getInt("catches")*/;
-            xpGain = (float)data.get("xpGain")/*data.getFloat("xpGain")*/;
+            File reader = new File("fishingHUD.json");
+            StringBuilder json = new StringBuilder();
+            Scanner myReader = new Scanner(reader);
+            while (myReader.hasNextLine()) {
+                json.append(myReader.nextLine());
+            }
+            System.out.println(json.toString());
+            myReader.close();
+            JSONObject data = new JSONObject(json.toString());
+            startTime = data.getInt("subSessionStartTime");
+            totalTime = data.getInt("totalTime");
+            catches = data.getInt("catches");
+            xpGain = data.getFloat("xpGain");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
