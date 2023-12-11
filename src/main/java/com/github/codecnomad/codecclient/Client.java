@@ -43,13 +43,13 @@ public class Client {
         // fishing HUD
 
         try {
-            FileWriter file = new FileWriter("main/resources/fishingHUD.json");
-            file.write("{\n" +
-                            "  \"startTime\":0,\n" +
-                            "  \"elapsedTimeSeconds\": 0,\n" +
-                            "  \"averageCPH\": 0,\n" +
-                            "  \"averageXPH\":0\n" +
-                            "}");
+            FileWriter file = new FileWriter("fishingHUD.json");
+            file.write(String.format("{\n" +
+                    "  \"subSessionStartTime\":%d,\n" +
+                    "  \"totalTime\": %d,\n" +
+                    "  \"catches\": %d,\n" +
+                    "  \"xpGain\": %f\n" +
+                    "}", 0, 0, 0, 0f));
             file.close();
         } catch (IOException e) {
             throw new RuntimeException(e);

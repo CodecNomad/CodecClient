@@ -22,13 +22,20 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 
 @SuppressWarnings("DuplicatedCode")
 public class FishingMacro extends Module {
     public static final String[] FAILSAFE_TEXT = new String[]{"?", "you good?", "HI IM HERE", "can you not bro", "can you dont", "j g growl wtf", "can i get friend request??", "hello i'm here",};
     public static int startTime = 0;
+    public static int totalTime = 0;
     public static int catches = 0;
     public static float xpGain = 0;
     public static FishingSteps currentStep = FishingSteps.FIND_ROD;
@@ -49,10 +56,19 @@ public class FishingMacro extends Module {
         this.state = true;
         lastYaw = Client.mc.thePlayer.rotationYaw;
         lastPitch = Client.mc.thePlayer.rotationPitch;
+        startTime = (int) java.lang.Math.floor((double) System.currentTimeMillis() / 1000);
+        try {
+            FileReader reader = new FileReader("fishingHUD.json");
+            JSONObject data = new JSONObject(reader.read());
+            startTime = (int)data.get("startTime")/*data.getInt("startTime")*/;
+            totalTime = (int)data.get("totalTime")/*data.getInt("totalTime")*/;
+            catches = (int)data.get("catches")/*data.getInt("catches")*/;
+            xpGain = (float)data.get("xpGain")/*data.getFloat("xpGain")*/;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         Sound.disableSounds();
-
-        startTime = (int) java.lang.Math.floor((double) System.currentTimeMillis() / 1000);
     }
 
     @Override
@@ -67,10 +83,6 @@ public class FishingMacro extends Module {
 
         Sound.enableSounds();
 
-        startTime = 0;
-        catches = 0;
-        xpGain = 0;
-
         currentStep = FishingSteps.FIND_ROD;
         MainCounter.reset();
         FailsafeCounter.reset();
@@ -80,6 +92,30 @@ public class FishingMacro extends Module {
         fishingMonster = null;
 
         lastAABB = null;
+
+        try{
+            File reader = new File("fishingHUD.json");
+            StringBuilder json = new StringBuilder();
+            Scanner myReader = new Scanner(reader);
+            while (myReader.hasNextLine()) {
+                json.append(myReader.nextLine());
+            }
+            System.out.println(json.toString());
+            myReader.close();
+            JSONObject data = new JSONObject(json.toString());
+            totalTime = data.getInt("totalTime") + (int) java.lang.Math.floor((double) System.currentTimeMillis() / 1000) - startTime;
+            System.out.println(totalTime);
+            FileWriter file = new FileWriter("fishingHUD.json");
+            file.write(String.format("{\n" +
+                                    "  \"subSessionStartTime\":%d,\n" +
+                                    "  \"totalTime\": %d,\n" +
+                                    "  \"catches\": %d,\n" +
+                                    "  \"xpGain\": %f\n" +
+                                    "}", startTime, totalTime, catches, xpGain));
+            file.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SubscribeEvent

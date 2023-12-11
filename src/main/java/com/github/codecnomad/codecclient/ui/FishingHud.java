@@ -6,6 +6,7 @@ import cc.polyfrost.oneconfig.libs.universal.UMatrixStack;
 import cc.polyfrost.oneconfig.renderer.NanoVGHelper;
 import cc.polyfrost.oneconfig.renderer.font.Fonts;
 import com.github.codecnomad.codecclient.Client;
+import com.github.codecnomad.codecclient.modules.FishingMacro;
 import com.github.codecnomad.codecclient.utils.Math;
 
 import static com.github.codecnomad.codecclient.modules.FishingMacro.*;
@@ -19,7 +20,7 @@ public class FishingHud extends BasicHud {
         }
 
         NanoVGHelper.INSTANCE.setupAndDraw(true, vg -> {
-            int elapsedTimeSeconds = (int) (System.currentTimeMillis() / 1000 - startTime);
+            int elapsedTimeSeconds = (int) (System.currentTimeMillis() / 1000 - startTime) + totalTime;
             int averageCPH = catches != 0 ? (catches * 3600) / (elapsedTimeSeconds != 0 ? elapsedTimeSeconds : 1) : 0;
             int averageXPH = xpGain != 0 ? (int) ((xpGain * 3600) / (elapsedTimeSeconds != 0 ? elapsedTimeSeconds : 1)) : 0;
 
