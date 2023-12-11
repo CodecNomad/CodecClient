@@ -45,11 +45,10 @@ public class Client {
         try {
             FileWriter file = new FileWriter("fishingHUD.json");
             file.write(String.format("{\n" +
-                    "  \"subSessionStartTime\":%d,\n" +
                     "  \"totalTime\": %d,\n" +
                     "  \"catches\": %d,\n" +
                     "  \"xpGain\": %f\n" +
-                    "}", 0, 0, 0, 0f));
+                    "}", 0, 0, 0f));
             file.close();
         } catch (IOException e) {
             throw new RuntimeException(e);

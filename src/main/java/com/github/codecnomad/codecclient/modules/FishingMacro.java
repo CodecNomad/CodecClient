@@ -67,14 +67,12 @@ public class FishingMacro extends Module {
             System.out.println(json.toString());
             myReader.close();
             JSONObject data = new JSONObject(json.toString());
-            startTime = data.getInt("subSessionStartTime");
             totalTime = data.getInt("totalTime");
             catches = data.getInt("catches");
             xpGain = data.getFloat("xpGain");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         Sound.disableSounds();
     }
 
@@ -111,14 +109,12 @@ public class FishingMacro extends Module {
             myReader.close();
             JSONObject data = new JSONObject(json.toString());
             totalTime = data.getInt("totalTime") + (int) java.lang.Math.floor((double) System.currentTimeMillis() / 1000) - startTime;
-            System.out.println(totalTime);
             FileWriter file = new FileWriter("fishingHUD.json");
             file.write(String.format("{\n" +
-                                    "  \"subSessionStartTime\":%d,\n" +
                                     "  \"totalTime\": %d,\n" +
                                     "  \"catches\": %d,\n" +
                                     "  \"xpGain\": %f\n" +
-                                    "}", startTime, totalTime, catches, xpGain));
+                                    "}",totalTime, catches, xpGain));
             file.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
