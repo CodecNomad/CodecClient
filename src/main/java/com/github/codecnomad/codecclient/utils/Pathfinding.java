@@ -1,6 +1,7 @@
 package com.github.codecnomad.codecclient.utils;
 
 import com.github.codecnomad.codecclient.Client;
+import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.AxisAlignedBB;
@@ -15,8 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 public class Pathfinding {
-    Set<Node> open = new HashSet<>();
-    Set<Node> closed = new HashSet<>();
+    Set<Node> open = new ConcurrentSet<>();
+    Set<Node> closed = new ConcurrentSet<>();
 
     @SubscribeEvent
     public void lastWorld(RenderWorldLastEvent event) {

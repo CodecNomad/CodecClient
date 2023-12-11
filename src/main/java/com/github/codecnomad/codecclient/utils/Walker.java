@@ -30,7 +30,7 @@ public class Walker {
     }
 
     @SubscribeEvent
-    public void clientTick(TickEvent.ClientTickEvent event) {
+    public void clientTick(TickEvent.RenderTickEvent event) {
         if (currentPoint >= wayPoints.size()) {
             stop();
             return;
@@ -61,7 +61,7 @@ public class Walker {
 
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), java.lang.Math.abs(Client.mc.thePlayer.motionX) + java.lang.Math.abs(Client.mc.thePlayer.motionZ) < 0.05 && wayPoints.get(currentPoint).getY() + 1 > Client.mc.thePlayer.posY);
 
-        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 3) {
+        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 1) {
             currentPoint++;
         }
     }

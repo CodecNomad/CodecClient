@@ -2,6 +2,7 @@ package com.github.codecnomad.codecclient.utils;
 
 import com.github.codecnomad.codecclient.Client;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.Vec3;
 
 public class Math {
 
@@ -57,6 +58,9 @@ public class Math {
         return (float) yaw;
     }
 
+    public static Vec3 fromBlockPos(BlockPos pos) {
+        return new Vec3(pos.getX(), pos.getY(), pos.getZ());
+    }
 
     public static float getPitch(BlockPos blockPos) {
         double deltaX = blockPos.getX() + 0.5 - Client.mc.thePlayer.posX;
@@ -66,9 +70,13 @@ public class Math {
         double pitchToBlock = -java.lang.Math.atan2(deltaY, distanceXZ);
         double pitch = java.lang.Math.toDegrees(pitchToBlock);
         pitch = java.lang.Math.max(-90, java.lang.Math.min(90, pitch));
-
         return (float) pitch;
     }
 
+    public static double getXZDistance(BlockPos pos1, BlockPos pos2) {
+        double xDiff = pos1.getX() - pos2.getX();
+        double zDiff = pos1.getZ() - pos2.getZ();
+        return java.lang.Math.sqrt(xDiff * xDiff + zDiff * zDiff);
+    }
 
 }

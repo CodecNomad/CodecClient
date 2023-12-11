@@ -33,16 +33,18 @@ public class MainCommand {
         @SubCommand
         public void add(int x, int y, int z) {
                 MinecraftForge.EVENT_BUS.register(this);
-                long start = System.currentTimeMillis();
-                path = pathfinding.createPath(Client.mc.thePlayer.getPosition().add(0, -1, 0), new BlockPos(x, y - 1, z));
-                Chat.sendMessage(System.currentTimeMillis() - start + " ms");
-                if (path != null) {
-                        Chat.sendMessage(String.format("Added waypoint: %d", waypoints.size()));
-                        waypoints.clear();
-                        waypoints.addAll(path);
-                } else {
-                        Chat.sendMessage("Failed to find path..");
-                }
+                new Thread(() -> {
+                        long start = System.currentTimeMillis();
+                        path = pathfinding.createPath(Client.mc.thePlayer.getPosition().add(0, -1, 0), new BlockPos(x, y - 1, z));
+                        Chat.sendMessage(System.currentTimeMillis() - start + " ms");
+                        if (path != null) {
+                                Chat.sendMessage(String.format("Added waypoint: %d", waypoints.size()));
+                                waypoints.clear();
+                                waypoints.addAll(path);
+                        } else {
+                                Chat.sendMessage("Failed to find path..");
+                        }
+                }).start();
         }
 
         @SubscribeEvent
