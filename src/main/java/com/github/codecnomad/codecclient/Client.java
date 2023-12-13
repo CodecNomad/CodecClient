@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +39,20 @@ public class Client {
         MinecraftForge.EVENT_BUS.register(MainCommand.pathfinding);
 
         CommandManager.register(new MainCommand());
+
+        // fishing HUD
+
+        try {
+            FileWriter file = new FileWriter("fishingHUD.json");
+            file.write(String.format("{\n" +
+                    "  \"totalTime\": %d,\n" +
+                    "  \"catches\": %d,\n" +
+                    "  \"xpGain\": %f\n" +
+                    "}", 0, 0, 0f));
+            file.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SubscribeEvent
