@@ -30,7 +30,7 @@ public class Walker {
     }
 
     @SubscribeEvent
-    public void clientTick(TickEvent.RenderTickEvent event) {
+    public void clientTick(TickEvent.ClientTickEvent event) {
         if (currentPoint >= wayPoints.size()) {
             stop();
             return;
@@ -38,30 +38,17 @@ public class Walker {
 
         float yawDifference = MathHelper.wrapAngleTo180_float(Math.getYaw(wayPoints.get(currentPoint)) - MathHelper.wrapAngleTo180_float(Client.mc.thePlayer.rotationYaw));
 
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), false);
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindLeft.getKeyCode(), false);
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindRight.getKeyCode(), false);
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), false);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), yawDifference > -67.5 && yawDifference <= 67.5);
 
-        if (yawDifference > -67.5 && yawDifference <= 67.5) {
-            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindForward.getKeyCode(), true);
-        }
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindLeft.getKeyCode(), yawDifference > -157.5 && yawDifference <= -22.5);
 
-        if (yawDifference > -157.5 && yawDifference <= -22.5) {
-            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindLeft.getKeyCode(), true);
-        }
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindRight.getKeyCode(), yawDifference > 22.5 && yawDifference <= 157.5);
 
-        if (yawDifference > 22.5 && yawDifference <= 157.5) {
-            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindRight.getKeyCode(), true);
-        }
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), (yawDifference > -180 && yawDifference <= -157.5) || (yawDifference > 157.5 && yawDifference <= 180));
 
-        if ((yawDifference > -180 && yawDifference <= -157.5) || (yawDifference > 157.5 && yawDifference <= 180)) {
-            KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), true);
-        }
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), java.lang.Math.abs(Client.mc.thePlayer.motionX) + java.lang.Math.abs(Client.mc.thePlayer.motionZ) < Client.mc.thePlayer.capabilities.getWalkSpeed() / 3);
 
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), java.lang.Math.abs(Client.mc.thePlayer.motionX) + java.lang.Math.abs(Client.mc.thePlayer.motionZ) < 0.05 && wayPoints.get(currentPoint).getY() + 1 > Client.mc.thePlayer.posY);
-
-        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 1) {
+        if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 1 + java.lang.Math.abs(Client.mc.thePlayer.posY - wayPoints.get(currentPoint).add(0, 1, 0).getY())) {
             currentPoint++;
         }
     }

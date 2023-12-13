@@ -1,7 +1,6 @@
 package com.github.codecnomad.codecclient.utils;
 
 import com.github.codecnomad.codecclient.Client;
-import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.AxisAlignedBB;
@@ -10,14 +9,12 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Pathfinding {
-    Set<Node> open = new ConcurrentSet<>();
-    Set<Node> closed = new ConcurrentSet<>();
+    PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingDouble(Node::getF));
+    Set<Node> closed = new HashSet<>();
 
     @SubscribeEvent
     public void lastWorld(RenderWorldLastEvent event) {
@@ -34,8 +31,8 @@ public class Pathfinding {
         open.clear();
         closed.clear();
 
-        Node start = new Node(s);
-        Node target = new Node(t);
+        Node start = new Node(s.add(0.5, 0.5, 0.5));
+        Node target = new Node(t.add(0.5, 0.5, 0.5));
 
         start.gCost = 0;
         start.hCost = start.distanceTo(target);
@@ -44,22 +41,12 @@ public class Pathfinding {
 
         long startTime = System.currentTimeMillis();
         while (!open.isEmpty() && (System.currentTimeMillis() - startTime) < 5000) {
-            Node currentNode = null;
-            double lowestF = Double.POSITIVE_INFINITY;
-
-            for (Node node : open) {
-                double fCost = node.getF();
-                if (fCost < lowestF) {
-                    lowestF = fCost;
-                    currentNode = node;
-                }
-            }
+            Node currentNode = open.poll();
 
             if (currentNode == null) {
                 break;
             }
 
-            open.remove(currentNode);
             closed.add(currentNode);
 
             if (currentNode.equals(target)) {
@@ -67,7 +54,7 @@ public class Pathfinding {
             }
 
             for (BlockPos neighbourPosition : currentNode.getNeighbourPositions()) {
-                Node neighbourNode = new Node(neighbourPosition);
+                Node neighbourNode = new Node(neighbourPosition.add(0.5, 0.5, 0.5));
 
                 if (neighbourNode.getBlockState() == null) {
                     return reconstructPath(currentNode);
@@ -81,9 +68,9 @@ public class Pathfinding {
                     continue;
                 }
 
-                Node node1 = new Node(neighbourNode.position.add(0, 1, 0));
-                Node node2 = new Node(neighbourNode.position.add(0, 2, 0));
-                Node node3 = new Node(neighbourNode.position.add(0, 3, 0));
+                Node node1 = new Node(neighbourNode.position.add(0, 1, 0).add(0.5, 0.5, 0.5));
+                Node node2 = new Node(neighbourNode.position.add(0, 2, 0).add(0.5, 0.5, 0.5));
+                Node node3 = new Node(neighbourNode.position.add(0, 3, 0).add(0.5, 0.5, 0.5));
 
                 IBlockState node1BS = node1.getBlockState();
                 IBlockState node2BS = node2.getBlockState();
@@ -140,7 +127,33 @@ public class Pathfinding {
             path.add(0, currentNode.position);
             currentNode = currentNode.parent;
         }
-        return path;
+        return smoothPath(path);
+    }
+
+    private List<BlockPos> smoothPath(List<BlockPos> path) {
+        List<BlockPos> smoothedPath = new ArrayList<>();
+        if (path.isEmpty()) {
+            return smoothedPath;
+        }
+
+        int k = 0;
+        smoothedPath.add(path.get(0));
+
+        for (int i = 1; i < path.size() - 1; i++) {
+            if (!canSee(smoothedPath.get(k), path.get(i + 1))) {
+                k++;
+                smoothedPath.add(smoothedPath.size(), path.get(i));
+            }
+        }
+
+        smoothedPath.add(smoothedPath.size(), path.get(path.size() - 1));
+
+        return smoothedPath;
+    }
+
+
+    boolean canSee(BlockPos start, BlockPos end) {
+        return Client.mc.theWorld.rayTraceBlocks(Math.fromBlockPos(start.add(0, 1, 0)), Math.fromBlockPos(end.add(0, 1, 0)), false, true, false) == null && Client.mc.theWorld.rayTraceBlocks(Math.fromBlockPos(start.add(0, 2, 0)), Math.fromBlockPos(end.add(0, 2, 0)), false, true, false) == null;
     }
 
     private static class Node {
@@ -190,6 +203,10 @@ public class Pathfinding {
         }
 
         boolean isIn(Set<Node> set) {
+            return set.stream().anyMatch(node -> node.position.equals(this.position));
+        }
+
+        boolean isIn(PriorityQueue<Node> set) {
             return set.stream().anyMatch(node -> node.position.equals(this.position));
         }
 
