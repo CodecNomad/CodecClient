@@ -107,9 +107,9 @@ public class Pathfinding {
                     continue;
                 }
 
-                double gCost = currentNode.distanceTo(neighbourNode);
+                double gCost = currentNode.gCost + 1;
 
-                if (!neighbourNode.isIn(open) || gCost < neighbourNode.gCost) {
+                if (!neighbourNode.isIn(open)) {
                     neighbourNode.parent = currentNode;
                     neighbourNode.gCost = gCost;
                     neighbourNode.hCost = neighbourNode.distanceTo(target);
@@ -127,33 +127,7 @@ public class Pathfinding {
             path.add(0, currentNode.position);
             currentNode = currentNode.parent;
         }
-        return smoothPath(path);
-    }
-
-    private List<BlockPos> smoothPath(List<BlockPos> path) {
-        List<BlockPos> smoothedPath = new ArrayList<>();
-        if (path.isEmpty()) {
-            return smoothedPath;
-        }
-
-        int k = 0;
-        smoothedPath.add(path.get(0));
-
-        for (int i = 1; i < path.size() - 1; i++) {
-            if (!canSee(smoothedPath.get(k), path.get(i + 1))) {
-                k++;
-                smoothedPath.add(smoothedPath.size(), path.get(i));
-            }
-        }
-
-        smoothedPath.add(smoothedPath.size(), path.get(path.size() - 1));
-
-        return smoothedPath;
-    }
-
-
-    boolean canSee(BlockPos start, BlockPos end) {
-        return Client.mc.theWorld.rayTraceBlocks(Math.fromBlockPos(start.add(0, 1, 0)), Math.fromBlockPos(end.add(0, 1, 0)), false, true, false) == null && Client.mc.theWorld.rayTraceBlocks(Math.fromBlockPos(start.add(0, 2, 0)), Math.fromBlockPos(end.add(0, 2, 0)), false, true, false) == null;
+        return path;
     }
 
     private static class Node {

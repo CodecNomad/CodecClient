@@ -23,6 +23,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.util.List;
 import java.util.regex.Matcher;
 
 @SuppressWarnings("DuplicatedCode")
@@ -42,6 +43,8 @@ public class FishingMacro extends Module {
     public static float lastYaw = 0;
     public static float lastPitch = 0;
     public static AxisAlignedBB lastAABB = null;
+    public BlockPos startPos = null;
+    public static Pathfinding pathfinding = new Pathfinding();
 
     @Override
     public void register() {
@@ -53,6 +56,8 @@ public class FishingMacro extends Module {
         Sound.disableSounds();
 
         startTime = (int) java.lang.Math.floor((double) System.currentTimeMillis() / 1000);
+
+        startPos = Client.mc.thePlayer.getPosition();
     }
 
     @Override
@@ -80,6 +85,8 @@ public class FishingMacro extends Module {
         fishingMonster = null;
 
         lastAABB = null;
+
+        startPos = null;
     }
 
     @SubscribeEvent
@@ -89,7 +96,21 @@ public class FishingMacro extends Module {
         }
 
         switch (currentStep) {
+            case GO_BACK_TO_ORIGINAL: {
+                currentStep = FishingSteps.EMPTY;
+                List<BlockPos> path = pathfinding.createPath(Client.mc.thePlayer.getPosition().add(0, -1 , 0), startPos.add(0, -1, 0));
+                new Walker(path, () -> {
+                    currentStep = FishingSteps.FIND_ROD;
+                }).start();
+                return;
+            }
+
             case FIND_ROD: {
+                if (startPos != null && Client.mc.thePlayer.getPosition().distanceSq(startPos) > 1.5) {
+                    currentStep = FishingSteps.GO_BACK_TO_ORIGINAL;
+                    return;
+                }
+
                 for (int slotIndex = 0; slotIndex < 9; slotIndex++) {
                     ItemStack stack = Client.mc.thePlayer.inventory.getStackInSlot(slotIndex);
                     if (stack != null && stack.getItem() instanceof ItemFishingRod) {
@@ -337,6 +358,8 @@ public class FishingMacro extends Module {
     }
 
     public enum FishingSteps {
+        EMPTY,
+        GO_BACK_TO_ORIGINAL,
         FIND_ROD,
         CAST_HOOK,
         WAIT_FOR_CATCH,

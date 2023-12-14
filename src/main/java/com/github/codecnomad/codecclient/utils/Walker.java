@@ -46,7 +46,7 @@ public class Walker {
 
         KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindBack.getKeyCode(), (yawDifference > -180 && yawDifference <= -157.5) || (yawDifference > 157.5 && yawDifference <= 180));
 
-        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), java.lang.Math.abs(Client.mc.thePlayer.motionX) + java.lang.Math.abs(Client.mc.thePlayer.motionZ) < Client.mc.thePlayer.capabilities.getWalkSpeed() / 3);
+        KeyBinding.setKeyBindState(Client.mc.gameSettings.keyBindJump.getKeyCode(), java.lang.Math.abs(Client.mc.thePlayer.motionX) + java.lang.Math.abs(Client.mc.thePlayer.motionZ) < Client.mc.thePlayer.capabilities.getWalkSpeed() / 3 && Client.mc.thePlayer.posY + 1 >= wayPoints.get(currentPoint).getY());
 
         if (Client.mc.thePlayer.getDistanceSq(wayPoints.get(currentPoint).add(0, 1, 0)) < 1 + java.lang.Math.abs(Client.mc.thePlayer.posY - wayPoints.get(currentPoint).add(0, 1, 0).getY())) {
             currentPoint++;
