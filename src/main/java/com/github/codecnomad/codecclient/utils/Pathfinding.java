@@ -1,6 +1,7 @@
 package com.github.codecnomad.codecclient.utils;
 
 import com.github.codecnomad.codecclient.Client;
+import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.AxisAlignedBB;
@@ -11,20 +12,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Pathfinding {
-    PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingDouble(Node::getF));
-    Set<Node> closed = new HashSet<>();
+    ConcurrentSkipListSet<Node> open = new ConcurrentSkipListSet<>(Comparator.comparingDouble(Node::getF));
+    Set<Node> closed = new ConcurrentSet<>();
 
     @SubscribeEvent
     public void lastWorld(RenderWorldLastEvent event) {
-        for (Node node : open) {
-            Render.drawOutlinedFilledBoundingBox(node.position, Color.green, event.partialTicks);
-        }
-
-        for (Node node : closed) {
-            Render.drawOutlinedFilledBoundingBox(node.position, Color.red, event.partialTicks);
-        }
+//        for (Node node : open) {
+//            Render.drawOutlinedFilledBoundingBox(node.position, Color.green, event.partialTicks);
+//        }
+//
+//        for (Node node : closed) {
+//            Render.drawOutlinedFilledBoundingBox(node.position, Color.red, event.partialTicks);
+//        }
     }
 
     public List<BlockPos> createPath(BlockPos s, BlockPos t) {
@@ -41,7 +43,7 @@ public class Pathfinding {
 
         long startTime = System.currentTimeMillis();
         while (!open.isEmpty() && (System.currentTimeMillis() - startTime) < 5000) {
-            Node currentNode = open.poll();
+            Node currentNode = open.pollFirst();
 
             if (currentNode == null) {
                 break;
@@ -108,6 +110,13 @@ public class Pathfinding {
                 }
 
                 double gCost = currentNode.gCost + 1;
+                for (BlockPos pos : neighbourNode.getBigNeighbourPositions()) {
+                    try {
+                        if (Client.mc.theWorld.getBlockState(pos).getBlock().getCollisionBoundingBox(Client.mc.theWorld, pos, Client.mc.theWorld.getBlockState(pos)).maxY - Client.mc.theWorld.getBlockState(pos).getBlock().getCollisionBoundingBox(Client.mc.theWorld, pos, Client.mc.theWorld.getBlockState(pos)).minY > 0.5) {
+                            gCost += gCost * 2;
+                        }
+                    } catch (Exception ignored) {}
+                }
 
                 if (!neighbourNode.isIn(open)) {
                     neighbourNode.parent = currentNode;
@@ -127,7 +136,32 @@ public class Pathfinding {
             path.add(0, currentNode.position);
             currentNode = currentNode.parent;
         }
-        return path;
+        return smoothPath(path);
+    }
+
+    private List<BlockPos> smoothPath(List<BlockPos> path) {
+        List<BlockPos> smoothedPath = new ArrayList<>();
+        if (path.isEmpty()) {
+            return smoothedPath;
+        }
+
+        int k = 0;
+        smoothedPath.add(path.get(0));
+
+        for (int i = 1; i < path.size() - 1; i++) {
+            if (!canSee(smoothedPath.get(k), path.get(i + 1))) {
+                k++;
+                smoothedPath.add(smoothedPath.size(), path.get(i));
+            }
+        }
+
+        smoothedPath.add(smoothedPath.size(), path.get(path.size() - 1));
+
+        return smoothedPath;
+    }
+
+    boolean canSee(BlockPos start, BlockPos end) {
+        return Client.mc.theWorld.rayTraceBlocks(Math.fromBlockPos(start.add(0, 1, 0)), Math.fromBlockPos(end.add(0, 1, 0)), false, true, false) == null && Client.mc.theWorld.rayTraceBlocks(Math.fromBlockPos(start.add(0, 2, 0)), Math.fromBlockPos(end.add(0, 2, 0)), false, true, false) == null;
     }
 
     private static class Node {
@@ -162,6 +196,19 @@ public class Pathfinding {
             neighbourPositions.add(this.position.add(-1, 1, 0));
             neighbourPositions.add(this.position.add(0, 1, 1));
             neighbourPositions.add(this.position.add(0, 1, -1));
+
+            return neighbourPositions;
+        }
+
+        List<BlockPos> getBigNeighbourPositions() {
+            List<BlockPos> neighbourPositions = new ArrayList<>();
+
+            for (int xOffset = -1; xOffset <= 1; xOffset++) {
+                for (int zOffset = -1; zOffset <= 1; zOffset++) {
+                    neighbourPositions.add(this.position.add(xOffset, 1, zOffset));
+                    neighbourPositions.add(this.position.add(xOffset, 2, zOffset));
+                }
+            }
 
             return neighbourPositions;
         }
