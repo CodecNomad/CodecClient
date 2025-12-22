@@ -1,7 +1,7 @@
-# Macros with actual effort put into them, unlike Jido...
+# Macros with actual effort put into them, unlike...
 ---
 ## Features:
 - fishing macro
 
 ## Discord:
-https://discord.com/invite/sKr4KwSkwG
+https://discord.gg/pUdE7WSnt4
